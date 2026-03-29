@@ -1,0 +1,76 @@
+{
+  "title": "Midnite Solar Classic",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Midnite Solar Classic",
+        "description": "Enter the network details of your Classic charge controller. The integration will connect to the device to validate the connection and retrieve the device name before proceeding.",
+        "data": {
+          "host": "IP Address",
+          "port": "Modbus TCP Port (default 502)",
+          "scan_interval": "Polling interval in seconds (30–3600)"
+        }
+      },
+      "parameters": {
+        "title": "Select monitored parameters — {device_name}",
+        "description": "Check the parameters you want to expose as Home Assistant entities. The defaults shown are the recommended set for most installations."
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the Classic controller. Verify the IP address and port, and ensure the device is reachable from Home Assistant.",
+      "module_not_found": "classic_modbusdecoder.py not found in the integration folder. Download it from https://github.com/qcda1/MidniteClassic and place it in custom_components/ha_midnite_classic/ together with Payload.py."
+    },
+    "abort": {
+      "already_configured": "A Midnite Classic at this address is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Midnite Solar Classic options",
+        "description": "Adjust the polling interval or change the set of monitored parameters.",
+        "data": {
+          "scan_interval": "Polling interval in seconds",
+          "BatVoltage": "Battery Voltage",
+          "PVVoltage": "PV Voltage",
+          "BatCurrent": "Battery Current",
+          "EnergyToday": "Energy Today",
+          "Power": "Power",
+          "ChargeStage": "Charge Stage",
+          "State": "State",
+          "PVCurrent": "PV Current",
+          "lastVOC": "Last VOC",
+          "HighestVinputLog": "Highest Vin Log",
+          "MatchPointShadow": "Match Point Shadow",
+          "AmpHours": "Amp Hours",
+          "TotalEnergy": "Total Energy",
+          "LifetimeAmpHours": "Lifetime Amp Hours",
+          "BatTemperature": "Battery Temperature",
+          "FETTemperature": "FET Temperature",
+          "PCBTemperature": "PCB Temperature",
+          "NiteMinutesNoPwr": "Night Minutes No Power",
+          "FloatTimeTodaySeconds": "Float Time Today",
+          "AbsorbTime": "Absorb Time",
+          "PWM_ReadOnly": "PWM",
+          "Name": "Device Name",
+          "ChargeStateText": "Charge State Text",
+          "MPPTMode": "MPPT Mode",
+          "Aux1Mode": "Aux 1 Mode",
+          "Aux2Mode": "Aux 2 Mode",
+          "VbatRegSetpoint": "Vbat Reg Setpoint",
+          "AbsorbVoltage": "Absorb Voltage",
+          "FloatVoltage": "Float Voltage",
+          "AbsorbEndAmps": "Absorb End Amps",
+          "WizBangJrRawCurrent": "WhizBang Jr Raw Current",
+          "ReasonForResting": "Reason For Resting",
+          "PCB": "PCB Version",
+          "Type": "Controller Type",
+          "unitID": "Unit ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the Classic controller — showing last known parameter list."
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "title": "Midnite Solar Classic",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connexion au Midnite Solar Classic",
+        "description": "Entrez les informations réseau de votre contrôleur de charge Classic. L'intégration va tenter de se connecter à l'appareil pour valider la connexion et récupérer le nom de l'appareil.",
+        "data": {
+          "host": "Adresse IP",
+          "port": "Port Modbus TCP (par défaut 502)",
+          "scan_interval": "Intervalle de lecture en secondes (30–3600)"
+        }
+      },
+      "parameters": {
+        "title": "Sélection des paramètres — {device_name}",
+        "description": "Cochez les paramètres que vous souhaitez exposer comme entités dans Home Assistant. Les valeurs par défaut correspondent aux paramètres recommandés pour la plupart des installations."
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter au contrôleur Classic. Vérifiez l'adresse IP et le port, et assurez-vous que l'appareil est accessible depuis Home Assistant.",
+      "module_not_found": "Le fichier classic_modbusdecoder.py est introuvable dans le dossier de l'intégration. Téléchargez-le depuis https://github.com/qcda1/MidniteClassic et placez-le dans custom_components/ha_midnite_classic/ avec Payload.py."
+    },
+    "abort": {
+      "already_configured": "Un Classic Midnite à cette adresse est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Midnite Solar Classic",
+        "description": "Ajustez l'intervalle de lecture ou modifiez la liste des paramètres surveillés.",
+        "data": {
+          "scan_interval": "Intervalle de lecture en secondes",
+          "BatVoltage": "Tension batterie",
+          "PVVoltage": "Tension PV",
+          "BatCurrent": "Courant batterie",
+          "EnergyToday": "Énergie aujourd'hui",
+          "Power": "Puissance",
+          "ChargeStage": "Étape de charge",
+          "State": "État",
+          "PVCurrent": "Courant PV",
+          "lastVOC": "Dernier VOC",
+          "HighestVinputLog": "Tension max enregistrée",
+          "MatchPointShadow": "Match Point Ombre",
+          "AmpHours": "Ampères-heures",
+          "TotalEnergy": "Énergie totale",
+          "LifetimeAmpHours": "Ah cumulés à vie",
+          "BatTemperature": "Température batterie",
+          "FETTemperature": "Température FET",
+          "PCBTemperature": "Température PCB",
+          "NiteMinutesNoPwr": "Minutes nuit sans puissance",
+          "FloatTimeTodaySeconds": "Temps flotteur aujourd'hui",
+          "AbsorbTime": "Temps d'absorption",
+          "PWM_ReadOnly": "PWM",
+          "Name": "Nom de l'appareil",
+          "ChargeStateText": "Texte état de charge",
+          "MPPTMode": "Mode MPPT",
+          "Aux1Mode": "Mode Aux 1",
+          "Aux2Mode": "Mode Aux 2",
+          "VbatRegSetpoint": "Consigne Vbat",
+          "AbsorbVoltage": "Tension d'absorption",
+          "FloatVoltage": "Tension flotteur",
+          "AbsorbEndAmps": "Courant fin absorption",
+          "WizBangJrRawCurrent": "Courant brut WhizBang Jr",
+          "ReasonForResting": "Raison du repos",
+          "PCB": "Version PCB",
+          "Type": "Type de contrôleur",
+          "unitID": "ID unité"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de joindre le contrôleur Classic — affichage de la dernière liste de paramètres connue."
+    }
+  }
+}
