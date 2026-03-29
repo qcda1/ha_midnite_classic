@@ -8,7 +8,7 @@
 # 🇫🇷 Français
 
 Intégration personnalisée pour les contrôleurs de charge solaire **Midnite Solar Classic 150** (et modèles compatibles).  
-Communique avec l'appareil via **Modbus TCP** en utilisant une version adaptée de `classic_modbusdecoder.py`, modifiée pour être compatible avec **pymodbus 3.9+** (suppression du paramètre `slave=`, isolation de `Payload.py` et de la classe `Endian` retirée de pymodbus).
+Communique avec l'appareil via **Modbus TCP**.
 
 ## Fonctionnalités
 
@@ -55,13 +55,13 @@ git pull origin main
 ```
 custom_components/ha_midnite_classic/
 ├── __init__.py
-├── classic_modbusdecoder.py   ← version modifiée pour pymodbus 3.9+
+├── classic_modbusdecoder.py
 ├── classic_reader.py
 ├── config_flow.py
 ├── const.py
 ├── coordinator.py
 ├── manifest.json
-├── Payload.py                 ← isolé de pymodbus 3.8.2, contient Endian
+├── Payload.py
 ├── sensor.py
 ├── translations/
 │   ├── en.json
@@ -143,7 +143,7 @@ Basé sur les travaux de [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/
 # 🇨🇦 English
 
 Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models).  
-Communicates with the device over **Modbus TCP** using an adapted version of `classic_modbusdecoder.py`, modified to be compatible with **pymodbus 3.9+** (removed `slave=` parameter, isolated `Payload.py` and the `Endian` class removed from pymodbus).
+Communicates with the device over **Modbus TCP**.
 
 ## Features
 
@@ -152,7 +152,7 @@ Communicates with the device over **Modbus TCP** using an adapted version of `cl
 - Select which parameters to expose as HA entities via the UI
 - Connection validation and automatic device name retrieval during setup
 - Multi-device support (multiple Classic controllers with different IP addresses)
-- Options flow (⚙️ icon) to change interval and parameters without reconfiguring
+- Options flow (⚙️ icon) to change interval and parameters without reconfiguring (To be fixed)
 
 ## Requirements
 
@@ -190,13 +190,13 @@ git pull origin main
 ```
 custom_components/ha_midnite_classic/
 ├── __init__.py
-├── classic_modbusdecoder.py   ← modified for pymodbus 3.9+
+├── classic_modbusdecoder.py
 ├── classic_reader.py
 ├── config_flow.py
 ├── const.py
 ├── coordinator.py
 ├── manifest.json
-├── Payload.py                 ← extracted from pymodbus 3.8.2, includes Endian
+├── Payload.py
 ├── sensor.py
 ├── translations/
 │   ├── en.json
