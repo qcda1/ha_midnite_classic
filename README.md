@@ -37,8 +37,6 @@ Via SSH sur votre instance HA :
 ```bash
 cd /config/custom_components/
 git clone https://github.com/qcda1/ha_midnite_classic.git ha_midnite_classic_repo
-cp -r ha_midnite_classic_repo/custom_components/ha_midnite_classic ./
-rm -rf ha_midnite_classic_repo
 ```
 
 Ou pour une installation liée à Git (mises à jour via `git pull`) :
@@ -171,9 +169,7 @@ Via SSH on your HA instance:
 
 ```bash
 cd /config/custom_components/
-git clone https://github.com/qcda1/ha_midnite_classic.git ha_midnite_classic_repo
-cp -r ha_midnite_classic_repo/custom_components/ha_midnite_classic ./
-rm -rf ha_midnite_classic_repo
+git clone https://github.com/qcda1/ha_midnite_classic.git ha_midnite_classic
 ```
 
 Or for a Git-linked install (updates via `git pull`):
