@@ -1,11 +1,11 @@
 # Midnite Solar Classic — Home Assistant Integration
 
-*[Français](#français) | [English](#english)*
+## *[Français](#français) | [English](#english)*
 
 ---
 
 <a name="français"></a>
-# 🇫🇷 Français
+# 🇨🇦 Français
 
 Intégration personnalisée pour les contrôleurs de charge solaire **Midnite Solar Classic 150** (et modèles compatibles).  
 Communique avec l'appareil via **Modbus TCP**.
