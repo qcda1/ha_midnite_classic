@@ -146,7 +146,7 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> OptionsFlow:
-        return MidniteClassicOptionsFlowHandler(config_entry)
+        return MidniteClassicOptionsFlowHandler()
 
 
 class MidniteClassicOptionsFlowHandler(OptionsFlow):
