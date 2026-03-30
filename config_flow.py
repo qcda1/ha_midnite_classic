@@ -10,6 +10,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
+from homeassistant.config_entries import OptionsFlow
 
 from .classic_reader import ClassicModuleNotFoundError, async_read_classic
 from .const import (
@@ -145,11 +146,12 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> MidniteClassicOptionsFlow:
-        return MidniteClassicOptionsFlow()
+        return MidniteClassicOptionsFlowHandler(config_entry)
 
 
-class MidniteClassicOptionsFlow():
-    """Options flow — adjust interval and monitored parameters."""
+#class MidniteClassicOptionsFlow():
+class MidniteClassicOptionsFlowHandler(OptionsFlow):
+        """Options flow — adjust interval and monitored parameters."""
 
 #    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
 #        self.config_entry = config_entry
