@@ -145,10 +145,10 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> MidniteClassicOptionsFlow:
-        return MidniteClassicOptionsFlow(config_entry)
+        return MidniteClassicOptionsFlow()
 
 
-class MidniteClassicOptionsFlow(config_entries.OptionsFlow):
+class MidniteClassicOptionsFlow():
     """Options flow — adjust interval and monitored parameters."""
 
 #    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
