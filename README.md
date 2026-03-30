@@ -49,7 +49,7 @@ git pull origin main
 ```
 
 ### 2 — Structure du dossier installé
-
+La structure suivante du répertoire est le résultat de l'étape 1:
 ```
 custom_components/ha_midnite_classic/
 ├── __init__.py
@@ -65,8 +65,8 @@ custom_components/ha_midnite_classic/
 │   ├── en.json
 │   └── fr.json
 └── brand/
-    ├── icon.png               ← 256×256 px
-    └── icon@2x.png            ← 512×512 px
+    ├── icon.png
+    └── icon@2x.png
 ```
 
 > Tous les fichiers nécessaires sont inclus dans ce dépôt — aucun téléchargement supplémentaire requis.
@@ -183,6 +183,7 @@ git pull origin main
 
 ### 2 — Installed folder structure
 
+Step 1 creates the custom component folder structure as follwo:
 ```
 custom_components/ha_midnite_classic/
 ├── __init__.py
@@ -198,8 +199,8 @@ custom_components/ha_midnite_classic/
 │   ├── en.json
 │   └── fr.json
 └── brand/
-    ├── icon.png               ← 256×256 px
-    └── icon@2x.png            ← 512×512 px
+    ├── icon.png
+    └── icon@2x.png
 ```
 
 > All required files are included in this repository — no additional downloads needed.
