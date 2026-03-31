@@ -1,6 +1,7 @@
 """Constants for the Midnite Solar Classic integration."""
 
 DOMAIN = "ha_midnite_classic"
+VERSION = "1.0.0"
 
 # Config entry keys
 CONF_HOST = "host"
@@ -33,11 +34,11 @@ DEFAULT_PARAMETERS = [
 # Format: key -> (friendly_name, unit, device_class_str, state_class_str, icon)
 PARAMETER_META: dict[str, tuple] = {
     "PCB":                    ("PCB Version",              None,  None,          None,                 "mdi:chip"),
-    "Type":                   ("Controller Type",           None,  None,          None,                 "mdi:solar-power"),
-    "Year":                   ("Firmware Year",             None,  None,          None,                 "mdi:calendar"),
-    "Month":                  ("Firmware Month",            None,  None,          None,                 "mdi:calendar"),
-    "Day":                    ("Firmware Day",              None,  None,          None,                 "mdi:calendar"),
-    "InfoFlagBits3":          ("Info Flag Bits 3",          None,  None,          None,                 "mdi:flag"),
+    "Type":                   ("Controller Type",          None,  None,          None,                 "mdi:solar-power"),
+    "Year":                   ("Firmware Year",            None,  None,          None,                 "mdi:calendar"),
+    "Month":                  ("Firmware Month",           None,  None,          None,                 "mdi:calendar"),
+    "Day":                    ("Firmware Day",             None,  None,          None,                 "mdi:calendar"),
+    "InfoFlagBits3":          ("Info Flag Bits 3",         None,  None,          None,                 "mdi:flag"),
     "mac_0":                  ("MAC Byte 0",               None,  None,          None,                 "mdi:ethernet"),
     "mac_1":                  ("MAC Byte 1",               None,  None,          None,                 "mdi:ethernet"),
     "mac_2":                  ("MAC Byte 2",               None,  None,          None,                 "mdi:ethernet"),
