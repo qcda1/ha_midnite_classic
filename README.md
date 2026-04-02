@@ -1,10 +1,11 @@
 # Midnite Solar Classic — Home Assistant Integration
 
-## *[Français](#français) | [English](#english)*
+## *[Français](#français) | [English*](#english)
 
 ---
 
-<a name="français"></a>
+
+
 # 🇨🇦 Français
 
 Intégration personnalisée pour les contrôleurs de charge solaire **Midnite Solar Classic 150** (et modèles compatibles).  
@@ -21,73 +22,58 @@ Communique avec l'appareil via **Modbus TCP**.
 
 ## Pré-requis
 
-| Composant | Version |
-|---|---|
-| Home Assistant OS | 2026.3+ |
-| pymodbus | ≥ 3.6.0 (installé automatiquement) |
+
+| Composant         | Version                            |
+| ----------------- | ---------------------------------- |
+| Home Assistant OS | 2026.3+                            |
+| pymodbus          | ≥ 3.6.0 (installé automatiquement) |
+
 
 Le Classic doit être connecté au réseau local et accessible depuis Home Assistant.
 
 ## Installation
 
-### 1 — Cloner le dépôt dans Home Assistant
+### 1 - Installer HACS (si ce n'est pas déjà fait)
 
-Via SSH sur votre instance HA :
+- Accédez à Paramètres → Appareils et services → Ajouter une intégration
+- Recherchez "HACS" et suivez l'installation
+- Authentifiez-vous avec GitHub
 
-```bash
-cd /config/custom_components/
-git clone https://github.com/qcda1/ha_midnite_classic.git ha_midnite_classic_repo
-```
+### 2 - Ajouter le dépôt comme dépôt personnalisé
 
-Ou pour une installation liée à Git (mises à jour via `git pull`) :
+Dans l'interface HACS :
 
-```bash
-cd /config/custom_components/ha_midnite_classic
-git init
-git remote add origin https://github.com/qcda1/ha_midnite_classic.git
-git pull origin main
-```
+- Cliquez sur les trois points en haut à droite
+- Sélectionnez "Dépôts personnalisés"
+- Ajoutez l'URL : [https://github.com/qcda1/ha_midnite_classic](https://github.com/qcda1/ha_midnite_classic)
+- Sélectionnez la catégorie : "Integration"
+- Cliquez sur "Ajouter"
 
-### 2 — Structure du dossier installé
-La structure suivante du répertoire est le résultat de l'étape 1:
-```
-custom_components/ha_midnite_classic/
-├── __init__.py
-├── classic_modbusdecoder.py
-├── classic_reader.py
-├── config_flow.py
-├── const.py
-├── coordinator.py
-├── manifest.json
-├── Payload.py
-├── sensor.py
-├── translations/
-│   ├── en.json
-│   └── fr.json
-└── brand/
-    ├── icon.png
-    └── icon@2x.png
-```
+### 3 - Installer l'intégration via HACS
 
-> Tous les fichiers nécessaires sont inclus dans ce dépôt — aucun téléchargement supplémentaire requis.
+Une fois le dépôt ajouté :
 
-### 3 — Redémarrer Home Assistant
-
-Paramètres → Système → Redémarrer.
+- Recherchez "Midnite Solar Classic" dans HACS
+- Cliquez sur "Télécharger"
+- Redémarrez Home Assistant: Paramètres → Système → Redémarrer (icône en haut à droite)
 
 ### 4 — Ajouter l'intégration
 
 Paramètres → Appareils et services → **+ Ajouter une intégration** → chercher **Midnite Solar Classic**.
 
+Passez à la prochaine étape de configuration
+
 ## Configuration
 
 ### Étape 1 — Connexion
 
-| Champ | Description | Défaut |
-|---|---|---|
-| Adresse IP | IP du Classic sur le réseau local | — |
-| Port Modbus TCP | Port du serveur Modbus du Classic | **502** |
-| Intervalle (s) | Fréquence de lecture en secondes (30–3600) | **60** |
+
+| Champ           | Description                                | Défaut  |
+| --------------- | ------------------------------------------ | ------- |
+| Adresse IP      | IP du Classic sur le réseau local          | —       |
+| Port Modbus TCP | Port du serveur Modbus du Classic          | **502** |
+| Intervalle (s)  | Fréquence de lecture en secondes (30–3600) | **60**  |
+
 
 L'intégration se connecte immédiatement pour valider la connexion et lire le nom de l'appareil (registre `Name`).
 
@@ -102,16 +88,19 @@ Cochés par défaut :
 
 Chaque paramètre sélectionné devient un capteur (`sensor`) avec unité, classe d'appareil et classe d'état attribuées automatiquement.
 
-| Paramètre | Unité | Classe |
-|---|---|---|
-| BatVoltage | V | voltage / measurement |
-| PVVoltage | V | voltage / measurement |
-| BatCurrent | A | current / measurement |
-| Power | W | power / measurement |
-| EnergyToday | kWh | energy / total_increasing |
-| TotalEnergy | kWh | energy / total_increasing |
-| BatTemperature | °C | temperature / measurement |
-| ChargeStateText | — | — |
+Par exemple:
+
+
+| Paramètre       | Unité | Classe                    |
+| --------------- | ----- | ------------------------- |
+| BatVoltage      | V     | voltage / measurement     |
+| PVVoltage       | V     | voltage / measurement     |
+| BatCurrent      | A     | current / measurement     |
+| Power           | W     | power / measurement       |
+| EnergyToday     | kWh   | energy / total_increasing |
+| TotalEnergy     | kWh   | energy / total_increasing |
+| ChargeStateText | —     | —                         |
+
 
 ## Options
 
@@ -124,11 +113,13 @@ Répétez « Ajouter une intégration » avec une adresse IP différente pour ch
 
 ## Dépannage
 
-| Symptôme | Solution |
-|---|---|
+
+| Symptôme                       | Solution                                                                      |
+| ------------------------------ | ----------------------------------------------------------------------------- |
 | « Impossible de se connecter » | Vérifier IP, port, et que le Classic est sous tension et accessible depuis HA |
-| Entités indisponibles | Consulter les logs HA : Paramètres → Système → Journaux |
-| Erreur pymodbus | Redémarrer HA — pymodbus ≥ 3.6.0 est installé automatiquement |
+| Entités indisponibles          | Consulter les logs HA : Paramètres → Système → Journaux                       |
+| Erreur pymodbus                | Redémarrer HA — pymodbus ≥ 3.6.0 est installé automatiquement                 |
+
 
 ## Licence
 
@@ -137,7 +128,8 @@ Basé sur les travaux de [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/
 
 ---
 
-<a name="english"></a>
+
+
 # 🇨🇦 English
 
 Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models).  
@@ -154,60 +146,40 @@ Communicates with the device over **Modbus TCP**.
 
 ## Requirements
 
-| Component | Version |
-|---|---|
-| Home Assistant OS | 2026.3+ |
-| pymodbus | ≥ 3.6.0 (installed automatically) |
+
+| Component         | Version                           |
+| ----------------- | --------------------------------- |
+| Home Assistant OS | 2026.3+                           |
+| pymodbus          | ≥ 3.6.0 (installed automatically) |
+
 
 The Classic must be connected to the local network and reachable from Home Assistant.
 
 ## Installation
 
-### 1 — Clone the repository into Home Assistant
+### 1 - Install HACS (if not allready done)
 
-Via SSH on your HA instance:
+- Goto Settings → Devices & Services → Add integration
+- Find HACS and follow the installation
+- Login with GitHub
 
-```bash
-cd /config/custom_components/
-git clone https://github.com/qcda1/ha_midnite_classic.git ha_midnite_classic
-```
+### 2 - Add the repository as a Custom repository
 
-Or for a Git-linked install (updates via `git pull`):
+In the HACS interface:
 
-```bash
-cd /config/custom_components/ha_midnite_classic
-git init
-git remote add origin https://github.com/qcda1/ha_midnite_classic.git
-git pull origin main
-```
+- Click on the 3 dots on top right corner
+- Select Custom repositories
+- Add the repo's URL [https://github.com/qcda1/ha_midnite_classic](https://github.com/qcda1/ha_midnite_classic)
+- Use Type Integration
+- Click Add
 
-### 2 — Installed folder structure
+### 3- Add the integration through HACS
 
-Step 1 creates the custom component folder structure as follwo:
-```
-custom_components/ha_midnite_classic/
-├── __init__.py
-├── classic_modbusdecoder.py
-├── classic_reader.py
-├── config_flow.py
-├── const.py
-├── coordinator.py
-├── manifest.json
-├── Payload.py
-├── sensor.py
-├── translations/
-│   ├── en.json
-│   └── fr.json
-└── brand/
-    ├── icon.png
-    └── icon@2x.png
-```
+Once the addition of the repository:
 
-> All required files are included in this repository — no additional downloads needed.
-
-### 3 — Restart Home Assistant
-
-Settings → System → Restart.
+- Search for Midnite Solar Classic in HACS
+- Click on "Download"
+- Restart Home Assistant: Settings → System → Restart (Restart icon top right).
 
 ### 4 — Add the integration
 
@@ -217,11 +189,13 @@ Settings → Devices & services → **+ Add integration** → search for **Midni
 
 ### Step 1 — Connection
 
-| Field | Description | Default |
-|---|---|---|
-| IP Address | Classic's IP on the local network | — |
-| Modbus TCP Port | Classic's Modbus server port | **502** |
-| Interval (s) | Polling frequency in seconds (30–3600) | **60** |
+
+| Field           | Description                            | Default |
+| --------------- | -------------------------------------- | ------- |
+| IP Address      | Classic's IP on the local network      | —       |
+| Modbus TCP Port | Classic's Modbus server port           | **502** |
+| Interval (s)    | Polling frequency in seconds (30–3600) | **60**  |
+
 
 The integration connects immediately to validate the connection and read the device name (`Name` register).
 
@@ -236,16 +210,19 @@ Checked by default:
 
 Each selected parameter becomes a `sensor` entity with unit, device class and state class assigned automatically.
 
-| Parameter | Unit | Class |
-|---|---|---|
-| BatVoltage | V | voltage / measurement |
-| PVVoltage | V | voltage / measurement |
-| BatCurrent | A | current / measurement |
-| Power | W | power / measurement |
-| EnergyToday | kWh | energy / total_increasing |
-| TotalEnergy | kWh | energy / total_increasing |
-| BatTemperature | °C | temperature / measurement |
-| ChargeStateText | — | — |
+For example:
+
+
+| Parameter       | Unit | Class                     |
+| --------------- | ---- | ------------------------- |
+| BatVoltage      | V    | voltage / measurement     |
+| PVVoltage       | V    | voltage / measurement     |
+| BatCurrent      | A    | current / measurement     |
+| Power           | W    | power / measurement       |
+| EnergyToday     | kWh  | energy / total_increasing |
+| TotalEnergy     | kWh  | energy / total_increasing |
+| ChargeStateText | —    | —                         |
+
 
 ## Options
 
@@ -258,11 +235,13 @@ Repeat "Add integration" with a different IP address for each device.
 
 ## Troubleshooting
 
-| Symptom | Solution |
-|---|---|
-| "Cannot connect" | Check IP, port, and that the Classic is powered on and reachable from HA |
-| Unavailable entities | Check HA logs: Settings → System → Logs |
-| pymodbus error | Restart HA — pymodbus ≥ 3.6.0 is installed automatically |
+
+| Symptom              | Solution                                                                 |
+| -------------------- | ------------------------------------------------------------------------ |
+| "Cannot connect"     | Check IP, port, and that the Classic is powered on and reachable from HA |
+| Unavailable entities | Check HA logs: Settings → System → Logs                                  |
+| pymodbus error       | Restart HA — pymodbus ≥ 3.6.0 is installed automatically                 |
+
 
 ## License
 
