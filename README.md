@@ -5,7 +5,7 @@
 ---
 
 
-
+<a id="français"></a>
 # 🇨🇦 Français
 
 Intégration personnalisée pour les contrôleurs de charge solaire **Midnite Solar Classic 150** (et modèles compatibles).  
