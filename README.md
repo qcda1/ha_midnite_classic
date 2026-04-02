@@ -129,7 +129,7 @@ Basé sur les travaux de [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/
 ---
 
 
-
+<a id="english"></a>
 # 🇨🇦 English
 
 Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models).  
