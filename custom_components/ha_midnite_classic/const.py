@@ -12,7 +12,7 @@ CONF_MONITORED_PARAMETERS = "monitored_parameters"
 # Defaults
 DEFAULT_PORT = 502
 DEFAULT_SCAN_INTERVAL = 60  # seconds
-MIN_SCAN_INTERVAL = 30
+MIN_SCAN_INTERVAL = 10
 MAX_SCAN_INTERVAL = 3600
 
 # Default parameters selected at installation
