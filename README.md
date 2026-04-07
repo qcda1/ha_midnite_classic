@@ -6,6 +6,7 @@
 
 
 <a id="français"></a>
+
 # 🇨🇦 Français
 
 Intégration personnalisée pour les contrôleurs de charge solaire **Midnite Solar Classic 150** (et modèles compatibles).  
@@ -14,7 +15,7 @@ Communique avec l'appareil via **Modbus TCP**.
 ## Fonctionnalités
 
 - Lecture périodique de tous les registres du Classic via Modbus TCP
-- Intervalle de lecture configurable de **30 à 3 600 secondes**
+- Intervalle de lecture configurable de **10 à 3 600 secondes**
 - Sélection des paramètres à exposer comme entités HA via l'interface graphique
 - Validation de la connexion et récupération automatique du nom de l'appareil lors de la configuration
 - Support multi-appareils (plusieurs Classic avec des adresses IP différentes)
@@ -126,10 +127,14 @@ Répétez « Ajouter une intégration » avec une adresse IP différente pour ch
 MIT.  
 Basé sur les travaux de [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/ClassicMQTT) et [qcda1/MidniteClassic](https://github.com/qcda1/MidniteClassic).
 
+
+## [Exemple](#example)
+
 ---
 
 
 <a id="english"></a>
+
 # 🇨🇦 English
 
 Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models).  
@@ -138,7 +143,7 @@ Communicates with the device over **Modbus TCP**.
 ## Features
 
 - Periodic polling of all Classic registers via Modbus TCP
-- Configurable polling interval from **30 to 3,600 seconds**
+- Configurable polling interval from **10 to 3,600 seconds**
 - Select which parameters to expose as HA entities via the UI
 - Connection validation and automatic device name retrieval during setup
 - Multi-device support (multiple Classic controllers with different IP addresses)
@@ -247,6 +252,9 @@ Repeat "Add integration" with a different IP address for each device.
 
 MIT.  
 Based on the work of [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/ClassicMQTT) and [qcda1/MidniteClassic](https://github.com/qcda1/MidniteClassic).
+
+
+<a id="example"></a>
 
 ### Exemple config / Config example
 
