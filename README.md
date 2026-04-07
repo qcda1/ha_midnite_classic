@@ -118,4 +118,4 @@ Based on the work of [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/Clas
 
 ### Exemple config / Config example
 
-Midnite Solar Classic
+![Midnite Solar Classic](ha_midnite_classic.png)
