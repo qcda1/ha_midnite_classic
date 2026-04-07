@@ -247,3 +247,7 @@ Repeat "Add integration" with a different IP address for each device.
 
 MIT.  
 Based on the work of [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/ClassicMQTT) and [qcda1/MidniteClassic](https://github.com/qcda1/MidniteClassic).
+
+### Exemple config / Config example
+
+![Midnite Solar Classic](ha_midnite_classic.png)
