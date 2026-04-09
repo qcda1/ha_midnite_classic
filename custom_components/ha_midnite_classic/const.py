@@ -87,6 +87,13 @@ PARAMETER_META: dict[str, tuple] = {
     "FloatVoltage":           ("Float Voltage",            "V",   "voltage",     None,                 "mdi:battery-arrow-down"),
     "AbsorbEndAmps":          ("Absorb End Amps",          "A",   "current",     None,                 "mdi:current-dc"),
     "ReasonForResting":       ("Reason For Resting",       None,  None,          None,                 "mdi:sleep"),
+    "AbsorbVoltageSetPoint":  ("Absorb Voltage setpoint",  "V",   "voltage",     "measurement",        "mdi:solar-panel"),
+    "FloatVoltageSetPoint":   ("Float Voltage setpoint",   "V",   "voltage",     "measurement",        "mdi:solar-panel"),
+    "EqualizeVoltageSetPoint":  ("Equalize Voltage setpoint",  "V",   "voltage", "measurement",        "mdi:solar-panel"),
+    "EqualizeTimeSetPoint":   ("Equalize Time Setpoint",   "s",   None,          None,                 "mdi:timer"),
+    "EqualizeIntervalDay":    ("Equalize Interval Day",    "day", None,          None,                 "mdi:numeric"),
+    "DaysBetweenBulkAbsorb":  ("DaysBetweenBulkAbsorb",    "day", None,          None,                 "mdi:numeric"),
+
 }
 
 # Coordinator key in hass.data
