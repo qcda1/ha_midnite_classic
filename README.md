@@ -2,7 +2,8 @@
 
 ---
 
-### Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models). Communicates with the device over **Modbus TCP**.
+## Custom integration for **Midnite Solar Classic 150** solar charge controllers (and compatible models). Communicates with the device over **Modbus TCP**
+
 
 ## Features
 
@@ -11,10 +12,9 @@
 - Select which parameters to expose as HA entities via the UI
 - Connection validation and automatic device name retrieval during setup
 - Multi-device support (multiple Classic controllers with different IP addresses)
-- Options flow (⚙️ icon) to change interval and parameters without reconfiguring (To be fixed)
+- Options flow (⚙️ icon) to change interval and parameter without reconfiguring (To be fixed)
 
 ## Requirements
-
 
 | Component         | Description                                                                                                                                                                        |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,13 +57,11 @@ Settings → Devices & services → **+ Add integration** → search for **Midni
 
 ### Step 1 — Connection
 
-
 | Field           | Description                            | Default |
 | --------------- | -------------------------------------- | ------- |
 | IP Address      | Classic's IP on the local network      | —       |
 | Modbus TCP Port | Classic's Modbus server port           | **502** |
 | Interval (s)    | Polling frequency in seconds (30–3600) | **60**  |
-
 
 The integration connects immediately to validate the connection and read the device name (`Name` register).
 
@@ -80,7 +78,6 @@ Each selected parameter becomes a `sensor` entity with unit, device class and st
 
 For example:
 
-
 | Parameter       | Unit | Class                     |
 | --------------- | ---- | ------------------------- |
 | BatVoltage      | V    | voltage / measurement     |
@@ -90,7 +87,6 @@ For example:
 | EnergyToday     | kWh  | energy / total_increasing |
 | TotalEnergy     | kWh  | energy / total_increasing |
 | ChargeStateText | —    | —                         |
-
 
 ## Options
 
@@ -103,19 +99,18 @@ Repeat "Add integration" with a different IP address for each device.
 
 ## Troubleshooting
 
-
 | Symptom              | Solution                                                                 |
 | -------------------- | ------------------------------------------------------------------------ |
 | "Cannot connect"     | Check IP, port, and that the Classic is powered on and reachable from HA |
 | Unavailable entities | Check HA logs: Settings → System → Logs                                  |
 | pymodbus error       | Restart HA — pymodbus ≥ 3.6.0 is installed automatically                 |
 
-
 ## License
 
 MIT.  
 Based on the work of [ClassicDIY/ClassicMQTT](https://github.com/ClassicDIY/ClassicMQTT) and [qcda1/MidniteClassic](https://github.com/qcda1/MidniteClassic).
 
-### Exemple config / Config example
+
+## Config example
 
 ![Midnite Solar Classic](ha_midnite_classic.png)

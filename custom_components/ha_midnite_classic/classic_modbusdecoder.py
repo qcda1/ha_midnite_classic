@@ -2,16 +2,18 @@
 
 # --------------------------------------------------------------------------- #
 # Handle the modbus data from the Classic.
+# The only method called out of this is getModbusData
+# This opens the client to the Classic, gets the data and closes it. It does not
+# keep the link open to the Classic.
 #
 # Based on https://github.com/ClassicDIY/ClassicMQTT
-# Modified by Daniel Côté — Payload.py isolated from pymodbus 3.8.2
-# Modified for ha_midnite_classic integration:
-#   - Endian imported from local Payload.py (removed pymodbus.constants dependency)
-#   - Added getRegisters(ip, port) entry point for HA integration
-# --------------------------------------------------------------------------- #
+#
+# 
+# # --------------------------------------------------------------------------- #
+
 
 from pymodbus.client import ModbusTcpClient as ModbusClient
-from .Payload import BinaryPayloadDecoder, Endian          # local — no pymodbus dependency
+from .Payload import BinaryPayloadDecoder, Endian
 from collections import OrderedDict
 import logging
 import sys
@@ -37,7 +39,7 @@ def _readRegisters(theClient, addr, cnt):
 
 
 # --------------------------------------------------------------------------- #
-# Return a decoder for the passed-in registers
+# Return a decoder for the passed in registers
 # --------------------------------------------------------------------------- #
 def getDataDecoder(registers):
     return BinaryPayloadDecoder.fromRegisters(
@@ -47,123 +49,151 @@ def getDataDecoder(registers):
 
 # --------------------------------------------------------------------------- #
 # Based on the address, return the decoded OrderedDict
+#
+# Note that the starting address is the target starting register address minus 1.
+# Excerpt from the Midnite Classic MODBUS protocol manual:
+# Note on addresses vs. registers:
+# The modbus specification adds one (1) to the “address” sent to the unit in the packet command to access a “register”. This is
+# so that modbus registers start at 1 rather than 0. The main Classic address map starts at register 4101 but the packet itself
+# sends out address 4100.
+# Some modbus software and libraries will go by register number and some will go by address so make sure which one it works
+# with.
 # --------------------------------------------------------------------------- #
+
+
 def doDecode(addr, decoder):
     if addr == 4100:
         decoded = OrderedDict(
             [
-                ("PCB", decoder.decode_8bit_uint()),
-                ("Type", decoder.decode_8bit_uint()),
-                ("Year", decoder.decode_16bit_uint()),
-                ("Month", decoder.decode_8bit_uint()),
-                ("Day", decoder.decode_8bit_uint()),
-                ("InfoFlagBits3", decoder.decode_16bit_uint()),
-                ("ignore", decoder.skip_bytes(2)),
-                ("mac_1", decoder.decode_8bit_uint()),
-                ("mac_0", decoder.decode_8bit_uint()),
-                ("mac_3", decoder.decode_8bit_uint()),
-                ("mac_2", decoder.decode_8bit_uint()),
-                ("mac_5", decoder.decode_8bit_uint()),
-                ("mac_4", decoder.decode_8bit_uint()),
-                ("ignore2", decoder.skip_bytes(4)),
-                ("unitID", decoder.decode_32bit_uint()),
-                ("StatusRoll", decoder.decode_16bit_uint()),
-                ("RsetTmms", decoder.decode_16bit_uint()),
-                ("BatVoltage", decoder.decode_16bit_int() / 10.0),
-                ("PVVoltage", decoder.decode_16bit_uint() / 10.0),
-                ("BatCurrent", decoder.decode_16bit_uint() / 10.0),
-                ("EnergyToday", decoder.decode_16bit_uint() / 10.0),
-                ("Power", decoder.decode_16bit_uint() / 1.0),
-                ("ChargeStage", decoder.decode_8bit_uint()),
-                ("State", decoder.decode_8bit_uint()),
-                ("PVCurrent", decoder.decode_16bit_uint() / 10.0),
-                ("lastVOC", decoder.decode_16bit_uint() / 10.0),
-                ("HighestVinputLog", decoder.decode_16bit_uint()),
-                ("MatchPointShadow", decoder.decode_16bit_uint()),
-                ("AmpHours", decoder.decode_16bit_uint()),
-                ("TotalEnergy", decoder.decode_32bit_uint() / 10.0),
-                ("LifetimeAmpHours", decoder.decode_32bit_uint()),
-                ("InfoFlagsBits", decoder.decode_32bit_uint()),
-                ("BatTemperature", decoder.decode_16bit_int() / 10.0),
-                ("FETTemperature", decoder.decode_16bit_int() / 10.0),
-                ("PCBTemperature", decoder.decode_16bit_int() / 10.0),
-                ("NiteMinutesNoPwr", decoder.decode_16bit_uint()),
-                ("MinuteLogIntervalSec", decoder.decode_16bit_uint()),
-                ("modbus_port_register", decoder.decode_16bit_uint()),
-                ("FloatTimeTodaySeconds", decoder.decode_16bit_uint()),
-                ("AbsorbTime", decoder.decode_16bit_uint()),
-                ("reserved1", decoder.decode_16bit_uint()),
-                ("PWM_ReadOnly", decoder.decode_16bit_uint()),
-                ("Reason_For_Reset", decoder.decode_16bit_uint()),
-                ("EqualizeTime", decoder.decode_16bit_uint()),
+                ("PCB", decoder.decode_8bit_uint()),  # 4101 MSB
+                ("Type", decoder.decode_8bit_uint()),  # 4101 LSB
+                ("Year", decoder.decode_16bit_uint()),  # 4102
+                ("Month", decoder.decode_8bit_uint()),  # 4103 MSB
+                ("Day", decoder.decode_8bit_uint()),  # 4103 LSB
+                ("InfoFlagBits3", decoder.decode_16bit_uint()),  # 4104
+                ("ignore", decoder.skip_bytes(2)),  # 4105 Reserved
+                ("mac_1", decoder.decode_8bit_uint()),  # 4106 MSB
+                ("mac_0", decoder.decode_8bit_uint()),  # 4106 LSB
+                ("mac_3", decoder.decode_8bit_uint()),  # 4107 MSB
+                ("mac_2", decoder.decode_8bit_uint()),  # 4107 LSB
+                ("mac_5", decoder.decode_8bit_uint()),  # 4108 MSB
+                ("mac_4", decoder.decode_8bit_uint()),  # 4108 LSB
+                ("ignore2", decoder.skip_bytes(4)),  # 4109, 4110
+                ("unitID", decoder.decode_32bit_uint()),  # 4111
+                ("StatusRoll", decoder.decode_16bit_uint()),  # 4113
+                ("RsetTmms", decoder.decode_16bit_uint()),  # 4114
+                ("BatVoltage", decoder.decode_16bit_int() / 10.0),  # 4115
+                ("PVVoltage", decoder.decode_16bit_uint() / 10.0),  # 4116
+                ("BatCurrent", decoder.decode_16bit_uint() / 10.0),  # 4117
+                ("EnergyToday", decoder.decode_16bit_uint() / 10.0),  # 4118
+                ("Power", decoder.decode_16bit_uint() / 1.0),  # 4119
+                ("ChargeStage", decoder.decode_8bit_uint()),  # 4120 MSB
+                ("State", decoder.decode_8bit_uint()),  # 4120 LSB
+                ("PVCurrent", decoder.decode_16bit_uint() / 10.0),  # 4121
+                ("lastVOC", decoder.decode_16bit_uint() / 10.0),  # 4122
+                ("HighestVinputLog", decoder.decode_16bit_uint()),  # 4123
+                ("MatchPointShadow", decoder.decode_16bit_uint()),  # 4124
+                ("AmpHours", decoder.decode_16bit_uint()),  # 4125
+                ("TotalEnergy", decoder.decode_32bit_uint() / 10.0),  # 4126, 4127
+                ("LifetimeAmpHours", decoder.decode_32bit_uint()),  # 4128, 4129
+                ("InfoFlagsBits", decoder.decode_32bit_uint()),  # 4130, 31
+                ("BatTemperature", decoder.decode_16bit_int() / 10.0),  # 4132
+                ("FETTemperature", decoder.decode_16bit_int() / 10.0),  # 4133
+                ("PCBTemperature", decoder.decode_16bit_int() / 10.0),  # 4134
+                ("NiteMinutesNoPwr", decoder.decode_16bit_uint()),  # 4135
+                ("MinuteLogIntervalSec", decoder.decode_16bit_uint()),  # 4136
+                ("modbus_port_register", decoder.decode_16bit_uint()),  # 4137
+                ("FloatTimeTodaySeconds", decoder.decode_16bit_uint()),  # 4138
+                ("AbsorbTime", decoder.decode_16bit_uint()),  # 4139
+                ("reserved1", decoder.decode_16bit_uint()),  # 4140
+                ("PWM_ReadOnly", decoder.decode_16bit_uint()),  # 4141
+                ("Reason_For_Reset", decoder.decode_16bit_uint()),  # 4142
+                ("EqualizeTime", decoder.decode_16bit_uint()),  # 4143
+            ]
+        )
+    elif addr == 4148:
+        decoded = OrderedDict(
+            [
+                ("AbsorbVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4149
+                ("FloatVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4150
+                ("EqualizeVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4151
             ]
         )
     elif addr == 4360:
         decoded = OrderedDict(
             [
-                ("WbangJrCmdS", decoder.decode_16bit_uint()),
-                ("WizBangJrRawCurrent", decoder.decode_16bit_int()),
-                ("skip", decoder.skip_bytes(4)),
-                ("WbJrAmpHourPOSitive", decoder.decode_32bit_uint()),
-                ("WbJrAmpHourNEGative", decoder.decode_32bit_int()),
-                ("WbJrAmpHourNET", decoder.decode_32bit_int()),
-                ("WhizbangBatCurrent", decoder.decode_16bit_int() / 10.0),
-                ("WizBangCRC", decoder.decode_8bit_int()),
-                ("ShuntTemperature", decoder.decode_8bit_int() - 50.0),
-                ("SOC", decoder.decode_16bit_uint()),
-                ("skip2", decoder.skip_bytes(6)),
-                ("RemainingAmpHours", decoder.decode_16bit_uint()),
-                ("skip3", decoder.skip_bytes(6)),
-                ("TotalAmpHours", decoder.decode_16bit_uint()),
+                ("WbangJrCmdS", decoder.decode_16bit_uint()),  # 4361
+                ("WizBangJrRawCurrent", decoder.decode_16bit_int() / 10.0),  # 4362
+                ("skip", decoder.skip_bytes(4)),  # 4363,4364
+                ("WbJrAmpHourPOSitive", decoder.decode_32bit_uint()),  # 4365,4366
+                ("WbJrAmpHourNEGative", decoder.decode_32bit_int()),  # 4367,4368
+                ("WbJrAmpHourNET", decoder.decode_32bit_int()),  # 4369,4370
+                ("WhizbangBatCurrent", decoder.decode_16bit_int() / 10.0),  # 4371
+                ("WizBangCRC", decoder.decode_8bit_int()),  # 4372 MSB
+                ("ShuntTemperature", decoder.decode_8bit_int() - 50.0),  # 4372 LSB
+                ("SOC", decoder.decode_16bit_uint()),  # 4373
+                ("skip2", decoder.skip_bytes(6)),  # 4374,75, 76
+                ("RemainingAmpHours", decoder.decode_16bit_uint()),  # 4377
+                ("skip3", decoder.skip_bytes(6)),  # 4378,79,80
+                ("TotalAmpHours", decoder.decode_16bit_uint()),  # 4381
             ]
         )
-    elif addr == 4163:
+    elif addr == 4161:
         decoded = OrderedDict(
             [
-                ("MPPTMode", decoder.decode_16bit_uint()),
-                ("Aux12Function", decoder.decode_16bit_uint()),
+                ("EqualizeTimeSetPoint", decoder.decode_16bit_uint()),  # 4162
+                ("EqualiseIntervalDay", decoder.decode_16bit_uint()),  # 4163
+                ("MPPTMode", decoder.decode_16bit_uint()),  # 4164
+                ("Aux12Function", decoder.decode_16bit_uint()),  # 4165
             ]
         )
     elif addr == 4209:
         decoded = OrderedDict(
             [
-                ("Name0", decoder.decode_8bit_uint()),
-                ("Name1", decoder.decode_8bit_uint()),
-                ("Name2", decoder.decode_8bit_uint()),
-                ("Name3", decoder.decode_8bit_uint()),
-                ("Name4", decoder.decode_8bit_uint()),
-                ("Name5", decoder.decode_8bit_uint()),
-                ("Name6", decoder.decode_8bit_uint()),
-                ("Name7", decoder.decode_8bit_uint()),
+                ("Name0", decoder.decode_8bit_uint()),  # 4210-MSB
+                ("Name1", decoder.decode_8bit_uint()),  # 4210-LSB
+                ("Name2", decoder.decode_8bit_uint()),  # 4211-MSB
+                ("Name3", decoder.decode_8bit_uint()),  # 4211-LSB
+                ("Name4", decoder.decode_8bit_uint()),  # 4212-MSB
+                ("Name5", decoder.decode_8bit_uint()),  # 4212-LSB
+                ("Name6", decoder.decode_8bit_uint()),  # 4213-MSB
+                ("Name7", decoder.decode_8bit_uint()),  # 4213-LSB
             ]
         )
     elif addr == 4213:
         decoded = OrderedDict(
             [
-                ("CTIME0", decoder.decode_32bit_uint()),
-                ("CTIME1", decoder.decode_32bit_uint()),
-                ("CTIME2", decoder.decode_32bit_uint()),
+                ("CTIME0", decoder.decode_32bit_uint()),  # 4214+#4215
+                ("CTIME1", decoder.decode_32bit_uint()),  # 4216+#4217
+                ("CTIME2", decoder.decode_32bit_uint()),  # 4218+#4219
             ]
         )
     elif addr == 4243:
         decoded = OrderedDict(
             [
-                ("VbattRegSetPTmpComp", decoder.decode_16bit_int() / 10.0),
-                ("nominalBatteryVoltage", decoder.decode_16bit_uint()),
-                ("endingAmps", decoder.decode_16bit_int() / 10.0),
-                ("skip", decoder.skip_bytes(56)),
-                ("ReasonForResting", decoder.decode_16bit_uint()),
+                ("VbattRegSetPTmpComp", decoder.decode_16bit_int() / 10.0),  # 4244
+                ("nominalBatteryVoltage", decoder.decode_16bit_uint()),  # 4245
+                ("endingAmps", decoder.decode_16bit_int() / 10.0),  # 4246
+                ("skip", decoder.skip_bytes(56)),  # 4247-4274
+                ("ReasonForResting", decoder.decode_16bit_uint()),  # 4275
+            ]
+        )
+    elif addr == 4251:
+        decoded = OrderedDict(
+            [
+                ("DaysBetweenBulkAbsorb", decoder.decode_16bit_int()),  # 4252
             ]
         )
     elif addr == 16386:
         decoded = OrderedDict(
             [
-                ("app_rev", decoder.decode_32bit_uint()),
-                ("net_rev", decoder.decode_32bit_uint()),
+                ("app_rev", decoder.decode_32bit_uint()),  # 16387, 16388
+                ("net_rev", decoder.decode_32bit_uint()),  # 16387, 16388
             ]
         )
     else:
-        decoded = OrderedDict()
+        log.warning(f"doDecode: adresse inconnue {addr} — ignorée")
+        return {}   # retourne dict vide plutôt que planter
 
     return decoded
 
@@ -191,10 +221,12 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         raw = {}
         raw[4100]  = _readRegisters(client, 4100,  44)
         raw[4360]  = _readRegisters(client, 4360,  22)
-        raw[4163]  = _readRegisters(client, 4163,   2)
+        raw[4148]  = _readRegisters(client, 4148,   3)
+        raw[4161]  = _readRegisters(client, 4161,   4)
         raw[4209]  = _readRegisters(client, 4209,   4)
         raw[4213]  = _readRegisters(client, 4213,   6)
         raw[4243]  = _readRegisters(client, 4243,  32)
+        raw[4251]  = _readRegisters(client, 4251,   1)
         raw[16386] = _readRegisters(client, 16386,  4)
 
     except Exception as ex:
@@ -324,3 +356,5 @@ def getRegisters(ip: str, port: int = 502) -> dict:
     decoded["ReasonForRestingText"] = rest_reason.get(idx, f"Unknown code: {idx}")
 
     return decoded
+
+

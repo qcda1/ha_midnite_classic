@@ -74,7 +74,8 @@ async def async_setup_entry(
 
         meta = PARAMETER_META.get(param)
         if meta:
-            friendly_name, unit, dc_str, sc_str, icon = meta
+            friendly_name, unit, dc_str, sc_str, icon, *rest = meta
+            precision = rest[0] if rest else None
         else:
             friendly_name, unit, dc_str, sc_str, icon = param, None, None, None, None
 
@@ -94,6 +95,7 @@ async def async_setup_entry(
                 host=host,
                 port=port,
                 entry_id=entry.entry_id,
+                precision=precision,
             )
         )
 
@@ -118,6 +120,7 @@ class MidniteClassicSensor(CoordinatorEntity[MidniteClassicCoordinator], SensorE
         host: str,
         port: int,
         entry_id: str,
+        precision: int | None = None,
     ) -> None:
         super().__init__(coordinator)
         self._param_key = param_key
@@ -128,7 +131,8 @@ class MidniteClassicSensor(CoordinatorEntity[MidniteClassicCoordinator], SensorE
         self._attr_icon = icon
         self._device_name = device_name
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_{param_key}"
-
+        if precision is not None:
+            self._attr_suggested_display_precision = precision
         self._device_host = host
         self._device_port = port
 
