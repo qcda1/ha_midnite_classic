@@ -123,7 +123,7 @@ def doDecode(addr, decoder):
         decoded = OrderedDict(
             [
                 ("WbangJrCmdS", decoder.decode_16bit_uint()),  # 4361
-                ("WizBangJrRawCurrent", decoder.decode_16bit_int()),  # 4362
+                ("WizBangJrRawCurrent", decoder.decode_16bit_int() / 10.0),  # 4362
                 ("skip", decoder.skip_bytes(4)),  # 4363,4364
                 ("WbJrAmpHourPOSitive", decoder.decode_32bit_uint()),  # 4365,4366
                 ("WbJrAmpHourNEGative", decoder.decode_32bit_int()),  # 4367,4368
