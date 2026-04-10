@@ -191,6 +191,9 @@ def doDecode(addr, decoder):
                 ("net_rev", decoder.decode_32bit_uint()),  # 16387, 16388
             ]
         )
+    else:
+        log.warning(f"doDecode: adresse inconnue {addr} — ignorée")
+        return {}   # retourne dict vide plutôt que planter
 
     return decoded
 
@@ -219,7 +222,7 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         raw[4100]  = _readRegisters(client, 4100,  44)
         raw[4360]  = _readRegisters(client, 4360,  22)
         raw[4148]  = _readRegisters(client, 4148,   3)
-        raw[4163]  = _readRegisters(client, 4161,   4)
+        raw[4161]  = _readRegisters(client, 4161,   4)
         raw[4209]  = _readRegisters(client, 4209,   4)
         raw[4213]  = _readRegisters(client, 4213,   6)
         raw[4243]  = _readRegisters(client, 4243,  32)
