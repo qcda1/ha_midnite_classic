@@ -13,7 +13,7 @@
       },
       "parameters": {
         "title": "Select monitored parameters — {device_name}",
-        "description": "Check the parameters you want to expose as Home Assistant entities. The defaults shown are the recommended set for most installations."
+        "description": "Check the parameters you want to expose as Home Assistant entities. The defaults shown are the recommended set for most installations. Writable setpoint parameters are always included and pre-checked."
       }
     },
     "error": {
@@ -28,7 +28,7 @@
     "step": {
       "init": {
         "title": "Midnite Solar Classic options",
-        "description": "Adjust the polling interval or change the set of monitored parameters.",
+        "description": "Adjust the polling interval or change the set of monitored parameters. Writable setpoint parameters are always included.",
         "data": {
           "scan_interval": "Polling interval in seconds",
           "BatVoltage": "Battery Voltage",
@@ -78,6 +78,28 @@
     },
     "error": {
       "cannot_connect": "Could not reach the Classic controller — showing last known parameter list."
+    }
+  },
+  "entity": {
+    "number": {
+      "absorbvoltagesetpoint": {
+        "name": "Absorb Voltage Setpoint"
+      },
+      "floatvoltagesetpoint": {
+        "name": "Float Voltage Setpoint"
+      },
+      "equalizevoltagesetpoint": {
+        "name": "Equalize Voltage Setpoint"
+      },
+      "equalizetimesetpoint": {
+        "name": "Equalize Time Setpoint"
+      },
+      "equalizeintervalday": {
+        "name": "Equalize Interval Day"
+      },
+      "daysbetweenbulkabsorb": {
+        "name": "Days Between Bulk/Absorb"
+      }
     }
   }
 }

@@ -13,7 +13,7 @@
       },
       "parameters": {
         "title": "Sélection des paramètres — {device_name}",
-        "description": "Cochez les paramètres que vous souhaitez exposer comme entités dans Home Assistant. Les valeurs par défaut correspondent aux paramètres recommandés pour la plupart des installations."
+        "description": "Cochez les paramètres que vous souhaitez exposer comme entités dans Home Assistant. Les valeurs par défaut correspondent aux paramètres recommandés pour la plupart des installations. Les paramètres de consigne éditables sont toujours inclus et pré-cochés."
       }
     },
     "error": {
@@ -28,7 +28,7 @@
     "step": {
       "init": {
         "title": "Options Midnite Solar Classic",
-        "description": "Ajustez l'intervalle de lecture ou modifiez la liste des paramètres surveillés.",
+        "description": "Ajustez l'intervalle de lecture ou modifiez la liste des paramètres surveillés. Les paramètres de consigne éditables sont toujours inclus.",
         "data": {
           "scan_interval": "Intervalle de lecture en secondes",
           "BatVoltage": "Tension batterie",
@@ -78,6 +78,28 @@
     },
     "error": {
       "cannot_connect": "Impossible de joindre le contrôleur Classic — affichage de la dernière liste de paramètres connue."
+    }
+  },
+  "entity": {
+    "number": {
+      "absorbvoltagesetpoint": {
+        "name": "Consigne Tension Absorption"
+      },
+      "floatvoltagesetpoint": {
+        "name": "Consigne Tension Flotteur"
+      },
+      "equalizevoltagesetpoint": {
+        "name": "Consigne Tension Égalisation"
+      },
+      "equalizetimesetpoint": {
+        "name": "Consigne Durée Égalisation"
+      },
+      "equalizeintervalday": {
+        "name": "Intervalle Égalisation (jours)"
+      },
+      "daysbetweenbulkabsorb": {
+        "name": "Jours entre Bulk/Absorption"
+      }
     }
   }
 }

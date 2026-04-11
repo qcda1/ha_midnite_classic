@@ -1,14 +1,5 @@
 """
-Wrapper around classic_modbusdecoder.py from https://github.com/qcda1/MidniteClassic
-
-Place these two files in the same directory as this integration:
-  custom_components/ha_midnite_classic/classic_modbusdecoder.py
-  custom_components/ha_midnite_classic/Payload.py
-
-Download via SSH on your HA host:
-  cd /config/custom_components/ha_midnite_classic/
-  curl -O https://raw.githubusercontent.com/qcda1/MidniteClassic/main/classic_modbusdecoder.py
-  curl -O https://raw.githubusercontent.com/qcda1/MidniteClassic/main/Payload.py
+Wrapper around classic_modbusdecoder.py 
 """
 
 from __future__ import annotations

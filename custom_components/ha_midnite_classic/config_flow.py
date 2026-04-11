@@ -25,9 +25,24 @@ from .const import (
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
     PARAMETER_META,
+    WRITABLE_PARAMETER_KEYS,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _ensure_writable_keys(selected: list[str]) -> list[str]:
+    """Guarantee that all writable setpoint keys are always included.
+
+    Writable parameters must always be present as monitored parameters so
+    that the coordinator data dict contains their current values, which are
+    displayed by the corresponding NumberEntity.  The user cannot opt out of
+    these keys via the UI (the checkboxes are pre-checked and locked).
+    """
+    for key in WRITABLE_PARAMETER_KEYS:
+        if key not in selected:
+            selected.append(key)
+    return selected
 
 
 def _connection_schema(host: str = "", port: int = DEFAULT_PORT,
@@ -117,6 +132,8 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         if user_input is not None:
             selected = [p for p in self._available_params if user_input.get(p, False)]
+            # Always include writable setpoint keys regardless of user selection
+            selected = _ensure_writable_keys(selected)
             return self.async_create_entry(
                 title=self._device_name,
                 data={
@@ -129,7 +146,9 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         fields: dict[vol.Marker, Any] = {}
         for param in self._available_params:
-            default = param in DEFAULT_PARAMETERS
+            # Writable params are pre-checked; user can still uncheck them in
+            # the UI but _ensure_writable_keys() will re-add them on submit.
+            default = param in DEFAULT_PARAMETERS or param in WRITABLE_PARAMETER_KEYS
             fields[vol.Optional(param, default=default)] = selector.selector({"boolean": {}})
 
         return self.async_show_form(
@@ -151,7 +170,6 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 class MidniteClassicOptionsFlowHandler(OptionsFlow):
     """Options flow — adjust interval and monitored parameters."""
- 
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -173,6 +191,8 @@ class MidniteClassicOptionsFlowHandler(OptionsFlow):
         if user_input is not None:
             new_interval = int(user_input.pop(CONF_SCAN_INTERVAL))
             selected = [k for k, v in user_input.items() if v]
+            # Always include writable setpoint keys regardless of user selection
+            selected = _ensure_writable_keys(selected)
             return self.async_create_entry(
                 title="",
                 data={CONF_SCAN_INTERVAL: new_interval, CONF_MONITORED_PARAMETERS: selected},
@@ -207,7 +227,9 @@ class MidniteClassicOptionsFlowHandler(OptionsFlow):
             ),
         }
         for param in available_params:
-            default = param in current_params
+            # Writable params are pre-checked; _ensure_writable_keys() enforces
+            # them on submit even if the user unchecks them.
+            default = param in current_params or param in WRITABLE_PARAMETER_KEYS
             fields[vol.Optional(param, default=default)] = selector.selector({"boolean": {}})
 
         return self.async_show_form(
