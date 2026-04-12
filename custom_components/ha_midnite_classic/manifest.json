@@ -1,7 +1,7 @@
 {
   "domain": "ha_midnite_classic",
   "name": "Midnite Solar Classic",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "config_flow": true,
   "documentation": "https://github.com/qcda1/ha_midnite_classic",
   "requirements": ["pymodbus>=3.6.0"],

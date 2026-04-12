@@ -64,10 +64,10 @@
           "AbsorbEndAmps": "Absorb End Amps",
           "WizBangJrRawCurrent": "WhizBang Jr Raw Current",
           "ReasonForResting": "Reason For Resting",
-          "AbsorbVoltageSetPoint": "Absorb Voltage SetPoint",
-          "FloatVoltageSetPoint": "Float Voltage SetPoint",
-          "EqualizeVoltageSetPoint": "Equalize Voltage SetPoint",
-          "EqualizeTimeSetPoint": "Equalize Time SetPoint",
+          "AbsorbVoltageSetPoint": "Absorb Voltage Setpoint",
+          "FloatVoltageSetPoint": "Float Voltage Setpoint",
+          "EqualizeVoltageSetPoint": "Equalize Voltage Setpoint",
+          "EqualizeTimeSetPoint": "Equalize Time Setpoint",
           "EqualizeIntervalDay": "Equalize Interval Days",
           "DaysBetweenBulkAbsorb": "Days between Bulk/Absorb",
           "PCB": "PCB Version",
@@ -83,22 +83,22 @@
   "entity": {
     "number": {
       "absorbvoltagesetpoint": {
-        "name": "Absorb Voltage Setpoint"
+        "name": "Absorb Voltage Setpoint (Set)"
       },
       "floatvoltagesetpoint": {
-        "name": "Float Voltage Setpoint"
+        "name": "Float Voltage Setpoint (Set)"
       },
       "equalizevoltagesetpoint": {
-        "name": "Equalize Voltage Setpoint"
+        "name": "Equalize Voltage Setpoint (Set)"
       },
       "equalizetimesetpoint": {
-        "name": "Equalize Time Setpoint"
+        "name": "Equalize Time Setpoint (Set)"
       },
       "equalizeintervalday": {
-        "name": "Equalize Interval Day"
+        "name": "Equalize Interval Day (Set)"
       },
       "daysbetweenbulkabsorb": {
-        "name": "Days Between Bulk/Absorb"
+        "name": "Days Between Bulk/Absorb (Set)"
       }
     }
   }

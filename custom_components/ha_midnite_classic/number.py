@@ -28,6 +28,13 @@ Rather than a post-write notification, we enforce this by making
 the current values of the neighbouring setpoints.  Home Assistant then rejects
 out-of-range values natively — with the same toast message shown for static
 min/max violations — before ``async_set_native_value()`` is ever called.
+
+Naming convention
+-----------------
+Editable number entities are suffixed with " (Set)" to distinguish them from
+the read-only sensor entities that share the same parameter name.
+Example:  "Absorb Voltage Setpoint"       → sensor (read-only)
+          "Absorb Voltage Setpoint (Set)"  → number (editable)
 """
 
 from __future__ import annotations
@@ -62,12 +69,17 @@ _META_MIN       = 7
 _META_MAX       = 8
 _META_STEP      = 9
 
+# Suffix appended to the friendly name of all editable number entities
+# to distinguish them from their read-only sensor counterparts.
+_EDITABLE_SUFFIX = " (Set)"
+
 # ---------------------------------------------------------------------------
 # Voltage setpoint ordering constraints enforced by the Classic firmware:
 #   EqualizeVoltage >= AbsorbVoltage >= FloatVoltage
 #
-# Each entry: param_key -> (dynamic_min_source_key, dynamic_max_source_key)
-#   None means use the static bound from PARAMETER_META (const.py).
+# Each entry: param_key -> dynamic bound source key
+#   _DYNAMIC_MIN_SOURCE : the current value of source_key becomes the minimum
+#   _DYNAMIC_MAX_SOURCE : the current value of source_key becomes the maximum
 # ---------------------------------------------------------------------------
 _DYNAMIC_MIN_SOURCE: dict[str, str] = {
     # Absorb minimum = current Float value
@@ -112,7 +124,8 @@ async def async_setup_entry(
             MidniteClassicNumber(
                 coordinator=coordinator,
                 param_key=param_key,
-                friendly_name=meta[_META_FRIENDLY],
+                # Suffix "(Set)" distinguishes editable entities from read-only sensors
+                friendly_name=f"{meta[_META_FRIENDLY]}{_EDITABLE_SUFFIX}",
                 unit=meta[_META_UNIT],
                 icon=meta[_META_ICON],
                 precision=meta[_META_PRECISION],

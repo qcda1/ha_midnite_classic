@@ -83,22 +83,22 @@
   "entity": {
     "number": {
       "absorbvoltagesetpoint": {
-        "name": "Consigne Tension Absorption"
+        "name": "Consigne Tension Absorption (Set)"
       },
       "floatvoltagesetpoint": {
-        "name": "Consigne Tension Flotteur"
+        "name": "Consigne Tension Flotteur (Set)"
       },
       "equalizevoltagesetpoint": {
-        "name": "Consigne Tension Égalisation"
+        "name": "Consigne Tension Égalisation (Set)"
       },
       "equalizetimesetpoint": {
-        "name": "Consigne Durée Égalisation"
+        "name": "Consigne Durée Égalisation (Set)"
       },
       "equalizeintervalday": {
-        "name": "Intervalle Égalisation (jours)"
+        "name": "Intervalle Égalisation (Set)"
       },
       "daysbetweenbulkabsorb": {
-        "name": "Jours entre Bulk/Absorption"
+        "name": "Jours entre Bulk/Absorption (Set)"
       }
     }
   }
