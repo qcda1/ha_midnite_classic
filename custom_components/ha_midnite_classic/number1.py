@@ -22,12 +22,9 @@ Error handling (all three behaviours)
 Voltage setpoint validation
 ----------------------------
 The Classic firmware enforces:  EqualizeVoltage >= AbsorbVoltage >= FloatVoltage
-
-Rather than a post-write notification, we enforce this by making
-``native_min_value`` and ``native_max_value`` dynamic properties that track
-the current values of the neighbouring setpoints.  Home Assistant then rejects
-out-of-range values natively — with the same toast message shown for static
-min/max violations — before ``async_set_native_value()`` is ever called.
+Attempting to write outside these bounds succeeds at the Modbus level but the
+device silently ignores the value.  We validate before writing and notify the
+user with a clear message rather than a silent no-op.
 """
 
 from __future__ import annotations
@@ -66,21 +63,16 @@ _META_STEP      = 9
 # Voltage setpoint ordering constraints enforced by the Classic firmware:
 #   EqualizeVoltage >= AbsorbVoltage >= FloatVoltage
 #
-# Each entry: param_key -> (dynamic_min_source_key, dynamic_max_source_key)
-#   None means use the static bound from PARAMETER_META (const.py).
+# Each entry: param_key -> (must_be_gte_key, must_be_lte_key)
+#   None means no constraint in that direction.
 # ---------------------------------------------------------------------------
-_DYNAMIC_MIN_SOURCE: dict[str, str] = {
-    # Absorb minimum = current Float value
-    "AbsorbVoltageSetPoint":   "FloatVoltageSetPoint",
-    # Equalize minimum = current Absorb value
-    "EqualizeVoltageSetPoint": "AbsorbVoltageSetPoint",
-}
-
-_DYNAMIC_MAX_SOURCE: dict[str, str] = {
-    # Float maximum = current Absorb value
-    "FloatVoltageSetPoint":  "AbsorbVoltageSetPoint",
-    # Absorb maximum = current Equalize value
-    "AbsorbVoltageSetPoint": "EqualizeVoltageSetPoint",
+_VOLTAGE_CONSTRAINTS: dict[str, tuple[str | None, str | None]] = {
+    # Float must be <= Absorb, no lower bound enforced here
+    "FloatVoltageSetPoint":    (None,                    "AbsorbVoltageSetPoint"),
+    # Absorb must be >= Float and <= Equalize
+    "AbsorbVoltageSetPoint":   ("FloatVoltageSetPoint",  "EqualizeVoltageSetPoint"),
+    # Equalize must be >= Absorb, no upper bound enforced here
+    "EqualizeVoltageSetPoint": ("AbsorbVoltageSetPoint", None),
 }
 
 
@@ -103,9 +95,7 @@ async def async_setup_entry(
     for param_key in WRITABLE_PARAMETER_KEYS:
         meta = PARAMETER_META.get(param_key)
         if meta is None:
-            _LOGGER.warning(
-                "Writable param %s has no PARAMETER_META entry — skipping", param_key
-            )
+            _LOGGER.warning("Writable param %s has no PARAMETER_META entry — skipping", param_key)
             continue
 
         entities.append(
@@ -116,8 +106,8 @@ async def async_setup_entry(
                 unit=meta[_META_UNIT],
                 icon=meta[_META_ICON],
                 precision=meta[_META_PRECISION],
-                static_min=meta[_META_MIN],
-                static_max=meta[_META_MAX],
+                min_value=meta[_META_MIN],
+                max_value=meta[_META_MAX],
                 step=meta[_META_STEP],
                 device_name=device_name,
                 host=host,
@@ -143,8 +133,8 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
         unit: str | None,
         icon: str | None,
         precision: int,
-        static_min: float,
-        static_max: float,
+        min_value: float,
+        max_value: float,
         step: float,
         device_name: str,
         host: str,
@@ -156,11 +146,9 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
         self._attr_name = friendly_name
         self._attr_native_unit_of_measurement = unit
         self._attr_icon = icon
+        self._attr_native_min_value = min_value
+        self._attr_native_max_value = max_value
         self._attr_native_step = step
-        # Static bounds from const.py — used as fallback when coordinator
-        # data is unavailable or the param has no dynamic constraint.
-        self._static_min = static_min
-        self._static_max = static_max
         if precision:
             self._attr_suggested_display_precision = precision
         self._device_name = device_name
@@ -198,39 +186,45 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
             return None
 
     # ------------------------------------------------------------------
-    # Dynamic bounds — enforce Classic firmware voltage ordering constraint:
-    #   EqualizeVoltage >= AbsorbVoltage >= FloatVoltage
-    #
-    # HA evaluates these properties before calling async_set_native_value(),
-    # so out-of-range values are rejected with the native toast notification —
-    # the same UX as static min/max violations.
+    # Voltage setpoint validation
     # ------------------------------------------------------------------
 
-    @property
-    def native_min_value(self) -> float:
-        """Return the effective minimum — dynamic for voltage setpoints."""
-        source_key = _DYNAMIC_MIN_SOURCE.get(self._param_key)
-        if source_key and self.coordinator.data:
-            val = self.coordinator.data.get(source_key)
-            if val is not None:
-                try:
-                    return float(val)
-                except (TypeError, ValueError):
-                    pass
-        return self._static_min
+    def _validate_voltage_setpoint(self, value: float) -> str | None:
+        """Check voltage ordering constraints imposed by the Classic firmware.
 
-    @property
-    def native_max_value(self) -> float:
-        """Return the effective maximum — dynamic for voltage setpoints."""
-        source_key = _DYNAMIC_MAX_SOURCE.get(self._param_key)
-        if source_key and self.coordinator.data:
-            val = self.coordinator.data.get(source_key)
-            if val is not None:
-                try:
-                    return float(val)
-                except (TypeError, ValueError):
-                    pass
-        return self._static_max
+        Returns a human-readable error message string if the value violates
+        a constraint, or None if the value is acceptable.
+
+        Constraints:  EqualizeVoltage >= AbsorbVoltage >= FloatVoltage
+        """
+        if self._param_key not in _VOLTAGE_CONSTRAINTS:
+            return None
+
+        gte_key, lte_key = _VOLTAGE_CONSTRAINTS[self._param_key]
+
+        if gte_key is not None:
+            gte_val = self.coordinator.data.get(gte_key)
+            if gte_val is not None:
+                gte_name = PARAMETER_META.get(gte_key, (gte_key,))[0]
+                if value < float(gte_val):
+                    return (
+                        f"**{self._attr_name}** ({value} V) cannot be lower than "
+                        f"**{gte_name}** ({gte_val} V).\n\n"
+                        f"The Classic enforces: Equalize ≥ Absorb ≥ Float."
+                    )
+
+        if lte_key is not None:
+            lte_val = self.coordinator.data.get(lte_key)
+            if lte_val is not None:
+                lte_name = PARAMETER_META.get(lte_key, (lte_key,))[0]
+                if value > float(lte_val):
+                    return (
+                        f"**{self._attr_name}** ({value} V) cannot be higher than "
+                        f"**{lte_name}** ({lte_val} V).\n\n"
+                        f"The Classic enforces: Equalize ≥ Absorb ≥ Float."
+                    )
+
+        return None
 
     # ------------------------------------------------------------------
     # Write path
@@ -239,15 +233,35 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
     async def async_set_native_value(self, value: float) -> None:
         """Handle a value change requested from the HA UI or an automation.
 
-        By the time this method is called, HA has already validated the value
-        against native_min_value / native_max_value — including the dynamic
-        voltage ordering constraints.  No additional validation is needed here.
-
         Flow
         ----
-        1. Delegate write + refresh to the coordinator.
-        2. On failure: log, show a persistent notification, restore old value.
+        1. Validate voltage ordering constraints (voltage setpoints only).
+        2. Delegate write + refresh to the coordinator.
+        3. On failure: log, show a persistent notification, restore old value.
         """
+
+        # --- Step 1: voltage constraint validation --------------------------
+        validation_error = self._validate_voltage_setpoint(value)
+        if validation_error:
+            _LOGGER.warning(
+                "Voltage constraint violation for %s = %s: %s",
+                self._param_key,
+                value,
+                validation_error,
+            )
+            await self.hass.services.async_call(
+                "persistent_notification",
+                "create",
+                {
+                    "title": "Midnite Classic — Invalid Setpoint",
+                    "message": validation_error,
+                    "notification_id": f"{DOMAIN}_validation_{self._param_key}",
+                },
+            )
+            self.async_write_ha_state()  # restore current value in UI
+            return
+
+        # --- Step 2: write via coordinator ----------------------------------
         result = await self.coordinator.async_write_setpoint(
             param_key=self._param_key,
             ha_value=value,
@@ -259,7 +273,7 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
             # once fresh data arrives — nothing more to do here.
             return
 
-        # --- Write failed: surface all three error behaviours ---------------
+        # --- Step 3: write failed — surface all three error behaviours ------
 
         # 1. Error log (always)
         _LOGGER.error(

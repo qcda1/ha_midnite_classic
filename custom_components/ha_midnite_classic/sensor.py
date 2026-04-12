@@ -131,7 +131,7 @@ class MidniteClassicSensor(CoordinatorEntity[MidniteClassicCoordinator], SensorE
         self._attr_icon = icon
         self._device_name = device_name
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_{param_key}"
-        if precision is not None:
+        if precision:
             self._attr_suggested_display_precision = precision
         self._device_host = host
         self._device_port = port

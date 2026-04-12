@@ -142,7 +142,7 @@ def doDecode(addr, decoder):
         decoded = OrderedDict(
             [
                 ("EqualizeTimeSetPoint", decoder.decode_16bit_uint()),  # 4162
-                ("EqualiseIntervalDay", decoder.decode_16bit_uint()),  # 4163
+                ("EqualizeIntervalDay", decoder.decode_16bit_uint()),  # 4163
                 ("MPPTMode", decoder.decode_16bit_uint()),  # 4164
                 ("Aux12Function", decoder.decode_16bit_uint()),  # 4165
             ]

@@ -102,9 +102,9 @@ PARAMETER_META: dict[str, tuple] = {
     "AbsorbVoltageSetPoint":   ("Absorb Voltage Setpoint",   "V",   "voltage",     "measurement",        "mdi:solar-panel",                 1, True,  10.0, 65.0, 0.1, 10),
     "FloatVoltageSetPoint":    ("Float Voltage Setpoint",    "V",   "voltage",     "measurement",        "mdi:solar-panel",                 1, True,  10.0, 65.0, 0.1, 10),
     "EqualizeVoltageSetPoint": ("Equalize Voltage Setpoint", "V",   "voltage",     "measurement",        "mdi:solar-panel",                 1, True,  10.0, 65.0, 0.1, 10),
-    "EqualizeTimeSetPoint":    ("Equalize Time Setpoint",    "s",   None,          None,                 "mdi:timer",                       0, True,  0,    480,  1,   1),
-    "EqualizeIntervalDay":     ("Equalize Interval Day",     "day", None,          None,                 "mdi:numeric",                     0, True,  0,    255,  1,   1),
-    "DaysBetweenBulkAbsorb":   ("Days Between Bulk/Absorb",  "day", None,          None,                 "mdi:numeric",                     0, True,  0,    255,  1,   1),
+    "EqualizeTimeSetPoint":    ("Equalize Time Setpoint",    "s",   None,          None,                 "mdi:timer",                       0, True,  0,   14400,   1,  1),
+    "EqualizeIntervalDay":     ("Equalize Interval Day",     "day", None,          None,                 "mdi:numeric",                     0, True,  0,     255,   1,  1),
+    "DaysBetweenBulkAbsorb":   ("Days Between Bulk/Absorb",  "day", None,          None,                 "mdi:numeric",                     0, True,  0,     255,   1,  1),
 }
 
 # Modbus register numbers for writable setpoints (address = register - 1)
