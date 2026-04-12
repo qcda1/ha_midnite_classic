@@ -69,9 +69,10 @@ _META_MIN       = 7
 _META_MAX       = 8
 _META_STEP      = 9
 
-# Suffix appended to the friendly name of all editable number entities
+# Suffix appended to the friendly name and edit icon of all editable number entities
 # to distinguish them from their read-only sensor counterparts.
 _EDITABLE_SUFFIX = " (Set)"
+_EDITABLE_ICON = "mdi:pencil-outline"
 
 # ---------------------------------------------------------------------------
 # Voltage setpoint ordering constraints enforced by the Classic firmware:
@@ -127,7 +128,7 @@ async def async_setup_entry(
                 # Suffix "(Set)" distinguishes editable entities from read-only sensors
                 friendly_name=f"{meta[_META_FRIENDLY]}{_EDITABLE_SUFFIX}",
                 unit=meta[_META_UNIT],
-                icon=meta[_META_ICON],
+                icon=_EDITABLE_ICON,
                 precision=meta[_META_PRECISION],
                 static_min=meta[_META_MIN],
                 static_max=meta[_META_MAX],
