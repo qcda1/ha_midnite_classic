@@ -12,7 +12,8 @@
 - Select which parameters to expose as HA entities via the UI
 - Connection validation and automatic device name retrieval during setup
 - Multi-device support (multiple Classic controllers with different IP addresses)
-- Options flow (⚙️ icon) to change interval and parameter without reconfiguring (To be fixed)
+- Options flow (⚙️ icon) to change interval and parameter without reconfiguring
+- Ability to change six registers allowing remote control of the Classic from HA
 
 ## Requirements
 
@@ -92,6 +93,25 @@ For example:
 
 Click ⚙️ to change the polling interval or the monitored parameter list.  
 Changes take effect immediately.
+
+## Six configuration registers
+
+The integration will create six configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
+
+| Parameter                     | Unit | Values                               | Register |
+| ----------------------------- | ---- | ------------------------------------ | -------- |
+| AbsorbVoltageSetPoint (Set)   | V    | See battery specs                    |  4149h   |
+| FloatVoltageSetPoint (Set)    | V    | See battery specs                    |  4150h   |
+| EqualizeVoltageSetPoint (Set) | A    | See battery specs                    |  4151h   |
+| EqualizeTimeSetPoint (Set)    | s    | See battery specs max 4h (14400s)    |  4162h   |
+| EqualizeIntervalDay (Set)     | day  | Nb days between Equalize stages      |  4163h   |
+| DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
+
+Note: *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enable 'EQ Auto' mode*
+
+Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.
+Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
+
 
 ## Multiple Classic controllers
 
