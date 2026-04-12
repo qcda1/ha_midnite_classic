@@ -110,6 +110,7 @@ The integration will create six configuration entities allowing user to change t
 Note: *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enable 'EQ Auto' mode*
 
 Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.
+
 Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
 
 
