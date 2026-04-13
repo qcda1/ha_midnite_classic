@@ -31,8 +31,9 @@ min/max violations — before ``async_set_native_value()`` is ever called.
 
 Naming convention
 -----------------
-Editable number entities are suffixed with " (Set)" to distinguish them from
-the read-only sensor entities that share the same parameter name.
+Editable number entities are suffixed with " (Set)" and have a specific
+icon (mdi:pencil-outline) to distinguish them from the read-only sensor
+entities that share the same parameter name.
 Example:  "Absorb Voltage Setpoint"       → sensor (read-only)
           "Absorb Voltage Setpoint (Set)"  → number (editable)
 """

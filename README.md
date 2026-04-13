@@ -89,14 +89,10 @@ For example:
 | TotalEnergy     | kWh  | energy / total_increasing |
 | ChargeStateText | —    | —                         |
 
-## Options
 
-Click ⚙️ to change the polling interval or the monitored parameter list.  
-Changes take effect immediately.
+## Six configuration entities
 
-## Six configuration registers
-
-The integration will create six configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
+The integration will also create six configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
 
 | Parameter                     | Unit | Values                               | Register |
 | ----------------------------- | ---- | ------------------------------------ | -------- |
@@ -107,16 +103,22 @@ The integration will create six configuration entities allowing user to change t
 | EqualizeIntervalDay (Set)     | day  | Nb days between Equalize stages      |  4163h   |
 | DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
 
-Note: *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enable 'EQ Auto' mode*
-
-Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.
+Notes:
+        *- Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enable 'EQ Auto' mode*
+        *- D'ont forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
+        *- Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
 
 Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
 
+## Options
+
+Click ⚙️ to change the polling interval or the monitored parameter list.  
+Changes take effect immediately.
 
 ## Multiple Classic controllers
 
 Repeat "Add integration" with a different IP address for each device.
+
 
 ## Troubleshooting
 
