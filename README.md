@@ -104,11 +104,10 @@ The integration will also create six configuration entities allowing user to cha
 | DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
 
 Notes:
-        *- Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enable 'EQ Auto' mode*
+- *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enables 'EQ Auto' mode*
+- *Don't forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
+- *Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
 
-        *- D'ont forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
-
-        *- Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
 
 Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
 
