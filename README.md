@@ -13,7 +13,7 @@
 - Connection validation and automatic device name retrieval during setup
 - Multi-device support (multiple Classic controllers with different IP addresses)
 - Options flow (⚙️ icon) to change interval and parameter without reconfiguring
-- Ability to change six registers allowing remote control of the Classic from HA
+- Ability to change six register values allowing remote control of the Classic from HA
 
 ## Requirements
 
@@ -21,7 +21,7 @@
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Home Assistant OS | Built on version 2026.3+                                                                                                                                                           |
 | pymodbus          | Built with version ≥ 3.6.0 (installed automatically in HAOS)                                                                                                                       |
-| network           | The Classic must be connected to the local network and reachable from Home Assistant.Need the address and the Classic's name must be set in the unit. See Network in user manual. |
+| network           | The Classic must be connected to the local network and reachable from Home Assistant. → Need the address and the Classic's name must be set in the unit. See Network in user manual. |
 
 
 ## Installation
@@ -104,6 +104,7 @@ The integration will also create six configuration entities allowing user to cha
 | DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
 
 Notes:
+
 - *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enables 'EQ Auto' mode*
 - *Don't forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
 - *Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
