@@ -61,7 +61,7 @@
           "VbatRegSetpoint": "Vbat Reg Setpoint",
           "AbsorbVoltage": "Absorb Voltage",
           "FloatVoltage": "Float Voltage",
-          "AbsorbEndAmps": "Absorb End Amps",
+          "endingAmps": "Absorb End Amps",
           "WizBangJrRawCurrent": "WhizBang Jr Raw Current",
           "ReasonForResting": "Reason For Resting",
           "AbsorbVoltageSetPoint": "Absorb Voltage Setpoint",
@@ -82,6 +82,9 @@
   },
   "entity": {
     "number": {
+      "endingAmps": {
+        "name": "Absorb End Amps SetPoint (Set)"
+      },
       "absorbvoltagesetpoint": {
         "name": "Absorb Voltage Setpoint (Set)"
       },

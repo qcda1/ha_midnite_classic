@@ -94,7 +94,7 @@ PARAMETER_META: dict[str, tuple] = {
     "BatType":                 ("Battery Type",              None,  None,          None,                 "mdi:battery",                     0, False, None, None, None, None),
     "AbsorbVoltage":           ("Absorb Voltage",            "V",   "voltage",     None,                 "mdi:battery-arrow-up",            0, False, None, None, None, None),
     "FloatVoltage":            ("Float Voltage",             "V",   "voltage",     None,                 "mdi:battery-arrow-down",          0, False, None, None, None, None),
-    "AbsorbEndAmps":           ("Absorb End Amps",           "A",   "current",     None,                 "mdi:current-dc",                  0, False, None, None, None, None),
+    "endingAmps":              ("Absorb End Amps",           "A",   "current",     None,                 "mdi:current-dc",                  1, True,     0, 20,  0.1,   10),
     "ReasonForResting":        ("Reason For Resting",        None,  None,          None,                 "mdi:sleep",                       0, False, None, None, None, None),
     # --- Writable setpoints (number entities) ---
     # Modbus register numbers (not addresses): H4149–H4151, H4162, H4163, H4252
@@ -110,12 +110,13 @@ PARAMETER_META: dict[str, tuple] = {
 # Modbus register numbers for writable setpoints (address = register - 1)
 # Per Classic manual note: packet sends address = register - 1
 WRITABLE_REGISTERS: dict[str, int] = {
+    "endingAmps":              4246,
     "AbsorbVoltageSetPoint":   4149,
     "FloatVoltageSetPoint":    4150,
     "EqualizeVoltageSetPoint": 4151,
     "EqualizeTimeSetPoint":    4162,
     "EqualizeIntervalDay":     4163,
-    "DaysBetweenBulkAbsorb":  4252,
+    "DaysBetweenBulkAbsorb":   4252,
 }
 
 # Keys that must always be included in monitored parameters (forced in config_flow)

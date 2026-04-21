@@ -61,7 +61,7 @@
           "VbatRegSetpoint": "Consigne Vbat",
           "AbsorbVoltage": "Tension d'absorption",
           "FloatVoltage": "Tension flotteur",
-          "AbsorbEndAmps": "Courant fin absorption",
+          "endingAmps": "Courant fin absorption",
           "WizBangJrRawCurrent": "Courant brut WhizBang Jr",
           "ReasonForResting": "Raison du repos",
           "AbsorbVoltageSetPoint": "Consigne Voltage Absorb",
@@ -82,6 +82,9 @@
   },
   "entity": {
     "number": {
+      "endingAmps": {
+        "name": "Consigne Courant fin absorption (Set)"
+      },
       "absorbvoltagesetpoint": {
         "name": "Consigne Tension Absorption (Set)"
       },
