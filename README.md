@@ -90,12 +90,13 @@ For example:
 | ChargeStateText | —    | —                         |
 
 
-## Six configuration entities
+## Seven configuration entities
 
-The integration will also create six configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
+The integration will also create seven configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
 
 | Parameter                     | Unit | Values                               | Register |
 | ----------------------------- | ---- | ------------------------------------ | -------- |
+| endingAmps                    | A    | See Classic Owner's Manual           |  4246h   |
 | AbsorbVoltageSetPoint (Set)   | V    | See battery specs                    |  4149h   |
 | FloatVoltageSetPoint (Set)    | V    | See battery specs                    |  4150h   |
 | EqualizeVoltageSetPoint (Set) | A    | See battery specs                    |  4151h   |
