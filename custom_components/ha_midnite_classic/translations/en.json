@@ -61,7 +61,7 @@
           "VbatRegSetpoint": "Vbat Reg Setpoint",
           "AbsorbVoltage": "Absorb Voltage",
           "FloatVoltage": "Float Voltage",
-          "endingAmps": "Absorb End Amps",
+          "endingAmps": "Ending Amps",
           "WizBangJrRawCurrent": "WhizBang Jr Raw Current",
           "ReasonForResting": "Reason For Resting",
           "AbsorbVoltageSetPoint": "Absorb Voltage Setpoint",
@@ -81,10 +81,12 @@
     }
   },
   "entity": {
+    "button": {
+      "eeprom_save": {
+        "name": "Save Settings to EEPROM"
+      }
+    },
     "number": {
-      "endingAmps": {
-        "name": "Absorb End Amps SetPoint (Set)"
-      },
       "absorbvoltagesetpoint": {
         "name": "Absorb Voltage Setpoint (Set)"
       },
@@ -102,6 +104,9 @@
       },
       "daysbetweenbulkabsorb": {
         "name": "Days Between Bulk/Absorb (Set)"
+      },
+      "endingamps": {
+        "name": "Ending Amps (Set)"
       }
     }
   }

@@ -81,10 +81,12 @@
     }
   },
   "entity": {
+    "button": {
+      "eeprom_save": {
+        "name": "Sauvegarder les paramètres dans l'EEPROM"
+      }
+    },
     "number": {
-      "endingAmps": {
-        "name": "Consigne Courant fin absorption (Set)"
-      },
       "absorbvoltagesetpoint": {
         "name": "Consigne Tension Absorption (Set)"
       },
@@ -102,6 +104,9 @@
       },
       "daysbetweenbulkabsorb": {
         "name": "Jours entre Bulk/Absorption (Set)"
+      },
+      "endingamps": {
+        "name": "Courant fin absorption (Set)"
       }
     }
   }
