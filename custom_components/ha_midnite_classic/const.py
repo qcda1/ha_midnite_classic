@@ -122,5 +122,17 @@ WRITABLE_REGISTERS: dict[str, int] = {
 # Keys that must always be included in monitored parameters (forced in config_flow)
 WRITABLE_PARAMETER_KEYS: list[str] = list(WRITABLE_REGISTERS.keys())
 
+# ---------------------------------------------------------------------------
+# EEPROM force-write constants (Force Flag Bits register 4160-4161)
+# ForceEEpromUpdateWriteF = 0x00000004 — saves all (EE) registers to EEPROM
+# Written as 32-bit value split across two 16-bit registers:
+#   Low  word → register 4160 (Modbus address 4159) = 0x0004
+#   High word → register 4161 (Modbus address 4160) = 0x0000
+# ---------------------------------------------------------------------------
+EEPROM_FORCE_WRITE_LOW_REG   = 4160   # register number — address = 4159
+EEPROM_FORCE_WRITE_HIGH_REG  = 4161   # register number — address = 4160
+EEPROM_FORCE_WRITE_LOW_VAL   = 0x0004
+EEPROM_FORCE_WRITE_HIGH_VAL  = 0x0000
+
 # Coordinator key in hass.data
 COORDINATOR = "coordinator"

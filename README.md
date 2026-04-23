@@ -14,6 +14,7 @@
 - Multi-device support (multiple Classic controllers with different IP addresses)
 - Options flow (⚙️ icon) to change interval and parameter without reconfiguring
 - Ability to change six register values allowing remote control of the Classic from HA
+- A button is made available to write register changes to EEPROM.
 
 ## Requirements
 
@@ -104,11 +105,14 @@ The integration will also create seven configuration entities allowing user to c
 | EqualizeIntervalDay (Set)     | day  | Nb days between Equalize stages      |  4163h   |
 | DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
 
+A button is created with the equipment to write modified data from RAM to EEPROM (Electrically Erasable Programmable Read-Only Memory). It mimik the "DATA SENT AND SAVED TO THE CONTROLLER" message on the MNGP when users change controller's parameters. This ensure the changes will remain in effect after a controller power-off or reboot.
+
 Notes:
 
 - *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enables 'EQ Auto' mode*
 - *Don't forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
 - *Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
+- *It is important to push the "Save Settings to EEPROM" button to store the modified values in memory to the EEPROM so it stays on controller power-off or reboot.*
 
 
 Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
@@ -130,6 +134,7 @@ Repeat "Add integration" with a different IP address for each device.
 | "Cannot connect"     | Check IP, port, and that the Classic is powered on and reachable from HA |
 | Unavailable entities | Check HA logs: Settings → System → Logs                                  |
 | pymodbus error       | Restart HA — pymodbus ≥ 3.6.0 is installed automatically                 |
+| Changes reverted to old value after a reboot or power-off | Make sure the "Save Settings to EEPROM" button is pressed after the change is made to the registers |
 
 ## License
 
