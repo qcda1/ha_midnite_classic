@@ -15,6 +15,7 @@
 - Options flow (⚙️ icon) to change interval and parameter without reconfiguring
 - Ability to change six register values allowing remote control of the Classic from HA
 - A button is made available to write register changes to EEPROM.
+- A switch to turn the Classic ON or OFF
 
 ## Requirements
 
