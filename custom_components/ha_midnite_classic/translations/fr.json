@@ -86,6 +86,11 @@
         "name": "Sauvegarder les paramètres dans l'EEPROM"
       }
     },
+    "switch": {
+      "mppt_controller": {
+        "name": "Contrôleur MPPT"
+      }
+    },
     "number": {
       "absorbvoltagesetpoint": {
         "name": "Consigne Tension Absorption (Set)"

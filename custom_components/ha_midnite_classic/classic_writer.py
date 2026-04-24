@@ -19,6 +19,17 @@ Write flow — setpoint registers
    surface success or failure to the user without any HA-specific imports
    in this module.
 
+Write flow — MPPT ON/OFF control
+----------------------------------
+Register 4164 (MpptMode) encodes both the MPPT mode and the ON/OFF state
+in its least significant bit (Classic manual Table 4164-1):
+  - Bit 0 = 1 → MPPT ON  (e.g. SOLAR = 0x000B = 11)
+  - Bit 0 = 0 → MPPT OFF (e.g. SOLAR = 0x000A = 10)
+
+``write_mppt_onoff()`` reads the current MPPTMode value from the coordinator
+data dict, sets or clears bit 0, and writes the result back to register 4164.
+Using bitwise OR/AND is more robust than ±1 as it is idempotent.
+
 Write flow — EEPROM persistence
 ---------------------------------
 The Classic stores writable setpoints in RAM only. Values are lost on device
@@ -47,6 +58,7 @@ from .const import (
     EEPROM_FORCE_WRITE_HIGH_VAL,
     EEPROM_FORCE_WRITE_LOW_REG,
     EEPROM_FORCE_WRITE_LOW_VAL,
+    MPPT_MODE_REGISTER,
     PARAMETER_META,
     WRITABLE_REGISTERS,
 )
@@ -64,8 +76,8 @@ class WriteResult:
     Attributes
     ----------
     success:    True if the Modbus write was acknowledged without error.
-    param_key:  The PARAMETER_META key that was written (or 'eeprom' for
-                EEPROM force-write).
+    param_key:  The PARAMETER_META key that was written (or 'eeprom' /
+                'mppt_onoff' for special writes).
     raw_value:  The integer word actually sent to the device.
     error:      Human-readable error message when success is False.
     """
@@ -177,6 +189,109 @@ async def write_register(
         _LOGGER.error(msg)
         return WriteResult(
             success=False, param_key=param_key, raw_value=raw_value, error=msg
+        )
+    finally:
+        client.close()
+
+
+async def write_mppt_onoff(
+    host: str,
+    port: int,
+    turn_on: bool,
+    current_mode: int,
+) -> WriteResult:
+    """Set or clear the ON/OFF bit (bit 0) of the MPPTMode register (4164).
+
+    The Classic encodes the MPPT mode and its ON/OFF state in register 4164:
+      - Bit 0 = 1 → controller ON  (e.g. SOLAR ON  = 0x000B = 11)
+      - Bit 0 = 0 → controller OFF (e.g. SOLAR OFF = 0x000A = 10)
+
+    Bitwise OR/AND is used rather than ±1 to make the operation idempotent —
+    calling turn_on when already ON, or turn_off when already OFF, is safe.
+
+    Parameters
+    ----------
+    host:           IP address of the Classic.
+    port:           Modbus TCP port (normally 502).
+    turn_on:        True to set bit 0 (ON), False to clear it (OFF).
+    current_mode:   Current raw value of MPPTMode from the coordinator data.
+
+    Returns
+    -------
+    ``WriteResult`` with param_key='mppt_onoff'.
+    """
+
+    if turn_on:
+        new_value: int = current_mode | 0x0001   # set bit 0
+    else:
+        new_value = current_mode & 0xFFFE         # clear bit 0
+
+    modbus_address: int = MPPT_MODE_REGISTER - 1  # 4163
+
+    _LOGGER.debug(
+        "MPPT %s: current_mode=%d (0x%04X) → new_value=%d (0x%04X), address=%d",
+        "ON" if turn_on else "OFF",
+        current_mode, current_mode,
+        new_value, new_value,
+        modbus_address,
+    )
+
+    client = AsyncModbusTcpClient(host=host, port=port)
+    try:
+        await client.connect()
+        if not client.connected:
+            msg = f"Could not connect to Classic at {host}:{port} for MPPT ON/OFF"
+            _LOGGER.error(msg)
+            return WriteResult(
+                success=False,
+                param_key="mppt_onoff",
+                raw_value=new_value,
+                error=msg,
+            )
+
+        response = await client.write_register(
+            address=modbus_address,
+            value=new_value,
+        )
+
+        if response.isError():
+            msg = (
+                f"Modbus error writing MPPT {'ON' if turn_on else 'OFF'} "
+                f"(register {MPPT_MODE_REGISTER}, raw {new_value}): {response}"
+            )
+            _LOGGER.error(msg)
+            return WriteResult(
+                success=False,
+                param_key="mppt_onoff",
+                raw_value=new_value,
+                error=msg,
+            )
+
+        _LOGGER.info(
+            "MPPT set to %s successfully (register %d, raw %d)",
+            "ON" if turn_on else "OFF",
+            MPPT_MODE_REGISTER,
+            new_value,
+        )
+        return WriteResult(success=True, param_key="mppt_onoff", raw_value=new_value)
+
+    except ModbusException as exc:
+        msg = f"ModbusException writing MPPT ON/OFF: {exc}"
+        _LOGGER.error(msg)
+        return WriteResult(
+            success=False,
+            param_key="mppt_onoff",
+            raw_value=new_value,
+            error=msg,
+        )
+    except Exception as exc:  # noqa: BLE001
+        msg = f"Unexpected error writing MPPT ON/OFF: {exc}"
+        _LOGGER.error(msg)
+        return WriteResult(
+            success=False,
+            param_key="mppt_onoff",
+            raw_value=new_value,
+            error=msg,
         )
     finally:
         client.close()

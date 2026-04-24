@@ -86,6 +86,11 @@
         "name": "Save Settings to EEPROM"
       }
     },
+    "switch": {
+      "mppt_controller": {
+        "name": "MPPT Controller"
+      }
+    },
     "number": {
       "absorbvoltagesetpoint": {
         "name": "Absorb Voltage Setpoint (Set)"

@@ -134,5 +134,8 @@ EEPROM_FORCE_WRITE_HIGH_REG  = 4161   # register number — address = 4160
 EEPROM_FORCE_WRITE_LOW_VAL   = 0x0004
 EEPROM_FORCE_WRITE_HIGH_VAL  = 0x0000
 
+# MPPT mode register (ON/OFF control via bit 0)
+MPPT_MODE_REGISTER = 4164   # register number — address = 4163
+
 # Coordinator key in hass.data
 COORDINATOR = "coordinator"

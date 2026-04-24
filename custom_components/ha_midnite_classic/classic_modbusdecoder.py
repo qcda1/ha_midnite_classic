@@ -302,8 +302,8 @@ def getRegisters(ip: str, port: int = 502) -> dict:
 
     # MPPT mode
     mppt_mode = {
-        1: "PV_Uset", 3: "DYNAMIC", 5: "WIND TRACK", 7: "RESERVED",
-        9: "Legacy P&O", 11: "SOLAR", 13: "HYDRO", 15: "RESERVED",
+        0: "PV_Uset", 1: "PV_Uset", 2: "DYNAMIC", 3: "DYNAMIC", 4: "WIND TRACK", 5: "WIND TRACK", 6: "RESERVED", 7: "RESERVED",
+        8: "Legacy P&O", 9: "Legacy P&O", 10: "SOLAR", 11: "SOLAR", 12: "HYDRO", 13: "HYDRO", 14: "RESERVED", 15: "RESERVED",
     }
     decoded["MPPTModeText"] = mppt_mode.get(
         decoded.get("MPPTMode"), f"Unknown ({decoded.get('MPPTMode')})"

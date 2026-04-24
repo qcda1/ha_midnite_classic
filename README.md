@@ -93,7 +93,7 @@ For example:
 
 ## Seven configuration entities
 
-The integration will also create seven configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
+- The integration will also create seven configuration entities allowing user to change the Classic register values. This allow remote control of the Classic from Home Assistant.
 
 | Parameter                     | Unit | Values                               | Register |
 | ----------------------------- | ---- | ------------------------------------ | -------- |
@@ -105,14 +105,16 @@ The integration will also create seven configuration entities allowing user to c
 | EqualizeIntervalDay (Set)     | day  | Nb days between Equalize stages      |  4163h   |
 | DaysBetweenBulkAbsorb (Set)   | Days | Days between Bulk/Absorb. Skip days. |  4252h   |
 
-A button is created with the equipment to write modified data from RAM to EEPROM (Electrically Erasable Programmable Read-Only Memory). It mimik the "DATA SENT AND SAVED TO THE CONTROLLER" message on the MNGP when users change controller's parameters. This ensure the changes will remain in effect after a controller power-off or reboot.
+- A button is created with the equipment to write modified data from RAM to EEPROM (Electrically Erasable Programmable Read-Only Memory). It mimik the "DATA SENT AND SAVED TO THE CONTROLLER" message on the MNGP when users change controller's parameters. This ensure the changes will remain in effect after a controller power-off or reboot.
+
+- A switch is created to allow the user to switch the controller ON and OFF the same way he would do with the MNGP.
 
 Notes:
 
 - *Equalize Time SetPoint = 0 → Manual mode. Equalize Time SetPoint ≠ 0 enables 'EQ Auto' mode*
 - *Don't forget that EqualizeVoltage >= AbsorbVoltage >= FloatVoltage*
 - *Refer to the Midnite Solar Classic Owner’s Manual for details about adjustments of these values.*
-- *It is important to push the "Save Settings to EEPROM" button to store the modified values in memory to the EEPROM so it stays on controller power-off or reboot.*
+- ***It is important to push the "Save Settings to EEPROM" button to store the modified values in memory to the EEPROM so it keeps its on controller power-off or reboot.***
 
 
 Details on Classic's registers are documented here → [Register map](docs/classic_register_map_Rev-C5-December-8-2013.pdf)
