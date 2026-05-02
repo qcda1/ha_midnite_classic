@@ -111,12 +111,14 @@ def doDecode(addr, decoder):
                 ("EqualizeTime", decoder.decode_16bit_uint()),  # 4143
             ]
         )
-    elif addr == 4148:
+    elif addr == 4147:
         decoded = OrderedDict(
             [
+                ("BatteryOutputCurrentLimit", decoder.decode_16bit_int() / 10.0),  # 4148
                 ("AbsorbVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4149
                 ("FloatVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4150
                 ("EqualizeVoltageSetPoint", decoder.decode_16bit_int() / 10.0),  # 4151
+                ("SlidingCurrentLimit", decoder.decode_16bit_int() / 10.0),  # 4152
             ]
         )
     elif addr == 4360:
@@ -221,7 +223,7 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         raw = {}
         raw[4100]  = _readRegisters(client, 4100,  44)
         raw[4360]  = _readRegisters(client, 4360,  22)
-        raw[4148]  = _readRegisters(client, 4148,   3)
+        raw[4147]  = _readRegisters(client, 4148,   5)
         raw[4161]  = _readRegisters(client, 4161,   4)
         raw[4209]  = _readRegisters(client, 4209,   4)
         raw[4213]  = _readRegisters(client, 4213,   6)
