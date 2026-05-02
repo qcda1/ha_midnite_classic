@@ -96,6 +96,9 @@ PARAMETER_META: dict[str, tuple] = {
     "FloatVoltage":            ("Float Voltage",             "V",   "voltage",     None,                 "mdi:battery-arrow-down",          0, False, None, None, None, None),
     "endingAmps":              ("Absorb End Amps",           "A",   "current",     None,                 "mdi:current-dc",                  1, True,     0, 20,  0.1,   10),
     "ReasonForResting":        ("Reason For Resting",        None,  None,          None,                 "mdi:sleep",                       0, False, None, None, None, None),
+    # Added by notnerb84
+    "BatteryOutputCurrentLimit":   ("Battery output Current Limit",   "A",   "current",     "measurement",        "mdi:current-dc",                 1, True,  10.0, 88.0, 0.1, 10),
+    "SlidingCurrentLimit":     ("Sliding Current Limit",     "A",   "current",     "measurement",        "mdi:current-dc",                  0, False, None, None, None, None),
     # --- Writable setpoints (number entities) ---
     # Modbus register numbers (not addresses): H4149–H4151, H4162, H4163, H4252
     # Address sent to device = register - 1 (per Modbus spec / Classic manual)
@@ -111,6 +114,7 @@ PARAMETER_META: dict[str, tuple] = {
 # Per Classic manual note: packet sends address = register - 1
 WRITABLE_REGISTERS: dict[str, int] = {
     "endingAmps":              4246,
+    "BatteryOutputCurrentLimit": 4148,
     "AbsorbVoltageSetPoint":   4149,
     "FloatVoltageSetPoint":    4150,
     "EqualizeVoltageSetPoint": 4151,
