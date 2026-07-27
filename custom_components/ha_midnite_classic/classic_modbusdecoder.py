@@ -48,6 +48,172 @@ def getDataDecoder(registers):
 
 
 # --------------------------------------------------------------------------- #
+# Lookup tables — texts taken verbatim from the manufacturer documentation:
+# "MidNite Solar MODBUS Network Spec. Rev C.5 — December 8, 2013"
+# (docs/classic_register_map_Rev-C5-December-8-2013.pdf)
+# --------------------------------------------------------------------------- #
+
+# Table 4120-1 — Charge Stage (register 4120 MSB)
+CHARGE_STAGE_TEXT = {
+    0: "Resting",
+    3: "Absorb",
+    4: "Bulk MPPT",
+    5: "Float",
+    6: "Float MPPT",
+    7: "Equalize",
+    10: "HyperVOC",
+    18: "Equalize MPPT",
+}
+
+# Tables 4165-1 / 4165-2 — AUX 1 & AUX 2 Off – Auto – On
+#   0 = output forced OFF (0 V)
+#   1 = output operates automatically as defined in AuxNFunction
+#   2 = output forced ON (~14 V)
+#   3 = unassigned at present
+AUX_OFF_AUTO_ON = {
+    0: "AUX Off",
+    1: "AUX Auto",
+    2: "AUX On",
+    3: "Unimplemented",
+}
+
+# Table 4165-3 — AUX 1 Function (Aux12Function bits 0-5)
+# NOTE: values 22 and 23 (SOC%) are not in Rev C.5 of the spec; they were added
+# in later Classic firmware and are kept here because they are what drives
+# generator start/stop on SOC.
+AUX1_FUNCTION_TEXT = {
+    1:  "DIVERSION SLOW HIGH",      # Non-PWM On at Vbatt > Aux1VoltsHiAbs (after Delay time), Off at Vbatt < Aux1VoltsLoAbs (after Hold time)
+    2:  "Low Battery Disconnect High",  # Same as DIVERSION SLOW HIGH but Active Low
+    3:  "WASTE NOT HIGH",           # Non-PWM On at Vbatt > Aux1VoltsHiAbs, Off at Vbatt < Aux1VoltsLoAbs (Active High)
+    4:  "WASTE NOT LOW",            # Non-PWM On at Vbatt > Aux1VoltsHiAbs, Off at Vbatt < Aux1VoltsLoAbs (Active Low)
+    5:  "RESERVED",                 # Unimplemented
+    6:  "RESERVED",                 # Unimplemented
+    7:  "PV V ON HIGH",             # Active High if Vin > Aux1VoltsHiPv (after Delay time); off if Vin < Aux1VoltsLoPv after Hold time
+    8:  "PV V ON LOW",              # Active Low if Vin > Aux1VoltsHiPv (after Delay time); on if Vin < Aux1VoltsLoPv after Hold time
+    9:  "RESERVED",                 # Unimplemented
+    10: "RESERVED",                 # Unimplemented
+    11: "RESERVED",                 # Unimplemented
+    12: "RESERVED",                 # Unimplemented
+    13: "TOGGLE TEST",              # Output toggles once per second On-Off-On-Off automatically
+    14: "NIGHT LIGHT HIGH",         # Active High On at Dawn, Off at Dusk
+    15: "DAY LIGHT HIGH",           # Active High Off at Dawn, On at Dusk
+    16: "WIND CLIPPER CONTROL",     # High when Vin > last Vin that yielded Absorb/Float/EQ, plus 5.0 V of headroom
+    17: "FLOAT HIGH",               # Output On when Floating, Off when not Float, after 2 seconds
+    18: "FLOAT LOW",                # Output Off when Floating, On when not Float, after 2 seconds
+    19: "VENT FAN HIGH",            # On when Vbatt > Aux1VoltsHiAbs after 1 s; Off when Vbatt < Aux1VoltsHiAbs after 30 s
+    20: "VENT FAN LOW",             # Off when Vbatt > Aux1VoltsHiAbs after 1 s; On when Vbatt < Aux1VoltsHiAbs after 30 s
+    21: "GFP TRIP HIGH",            # Output On for ~0.150 seconds when a Ground Fault occurs
+    22: "SOC% HIGH",                # Later firmware — Active High on State Of Charge threshold
+    23: "SOC% LOW",                 # Later firmware — Active Low on State Of Charge threshold
+}
+
+# Table 4165-4 — AUX 2 Function (Aux12Function bits 8-13)
+AUX2_FUNCTION_TEXT = {
+    0:  "DIVERSION HIGH PWM",       # Digital Out PWM Battery Diversion (Active High)
+    1:  "DIVERSION LOW PWM",        # Digital Out PWM Battery Diversion (Active Low)
+    2:  "WASTE NOT HIGH",           # Digital Out PWM relative to Charge Stage Voltage Threshold Diversion (Use It Or Lose It) (Active High)
+    3:  "WASTE NOT LOW",            # Digital Out PWM relative to Charge Stage Voltage Threshold Diversion (Use It Or Lose It) (Active Low)
+    4:  "RESERVED",                 # Unimplemented
+    5:  "RESERVED",                 # Unimplemented
+    6:  "TOGGLE TEST",              # Out once per second On-Off-On-Off automatic toggle
+    7:  "PV V ON HIGH",             # Active High output if Vin exceeds Aux2VoltsHiPv
+    8:  "PV V ON LOW",              # Active Low output if Vin exceeds Aux2VoltsHiPv
+    9:  "RESERVED",                 # Unimplemented
+    10: "WIND CLIPPER CONTROL",     # PWM output Active High when Vin is above PV input V plus headroom voltage
+    11: "NIGHT LIGHT HIGH",         # Active High On at Dawn, Off at Dusk
+    12: "DAY LIGHT HIGH",           # Active High Off at Dawn, On at Dusk
+    13: "FLOAT HIGH OUTPUT",        # Active High output when Float stage is reached
+    14: "FLOAT LOW OUTPUT",         # Active Low output when Float stage is reached
+    15: "Active HIGH (input) turn off",  # > 6.0 V into Aux 2 forces Classic to resting (15 V max)
+    16: "Active LOW (input) turn off",   # < 2.0 V into Aux 2 forces Classic to resting (0 V min)
+    17: "Active HIGH (input) Float",     # > 6.0 V into Aux 2 forces Classic to Float (15 V max)
+    18: "Whizbang Junior (WB Jr.)",      # Aux 2 commands WB Jr. and receives info from WB Jr.
+}
+
+# Table 4164-1 — MPPT Mode (register 4164)
+# "Bit 0 is the ON/OFF (Enable/Disable). Table shows modes as ON —
+#  subtract one (1) if showing mode as OFF."
+# Both the ON (odd) and OFF (even) encodings are mapped so the text stays
+# meaningful when the MPPT controller is switched off (see switch.py).
+MPPT_MODE_TEXT = {
+    0x0000: "PV_Uset",      0x0001: "PV_Uset",      # U-SET MPPT mode
+    0x0002: "DYNAMIC",      0x0003: "DYNAMIC",      # Slow Dynamic Solar Tracking (old Solar 1 O&P)
+    0x0004: "WIND TRACK",   0x0005: "WIND TRACK",   # Wind Track mode
+    0x0006: "RESERVED",     0x0007: "RESERVED",     # Reserved for future Wind Learn mode
+    0x0008: "Legacy P&O",   0x0009: "Legacy P&O",   # Legacy P&O sweep mode
+    0x000A: "SOLAR",        0x000B: "SOLAR",        # Fast SOLAR track (old PV Learn mode)
+    0x000C: "HYDRO",        0x000D: "HYDRO",        # Micro Hydro mode (similar to Legacy P&O)
+    0x000E: "RESERVED",     0x000F: "RESERVED",     # RESERVED
+}
+
+# Table 4275-1 — Reason For Resting (register 4275)
+# Descriptions are reproduced verbatim from the manufacturer documentation.
+# Values 104 and 111 are not in the spec but are observed in the field.
+REASON_FOR_RESTING_TEXT = {
+    1:  "Anti-Click. Not enough power available (Wake Up)",
+    2:  "Insane Ibatt Measurement (Wake Up)",
+    3:  "Negative Current (load on PV input ?) (Wake Up)",
+    4:  "PV Input Voltage lower than Battery V (Vreg state)",
+    5:  "Too low of power out and Vbatt below set point for > 90 seconds",
+    6:  "FET temperature too high (Cover is on maybe?)",
+    7:  "Ground Fault Detected",
+    8:  "Arc Fault Detected",
+    9:  "Too much negative current while operating (backfeed from battery out of PV input)",
+    10: "Battery is less than 8.0 Volts",
+    11: "PV input is available but V is rising too slowly. Low Light or bad connection (Solar mode)",
+    12: "Voc has gone down from last Voc or low light. Re-check (Solar mode)",
+    13: "Voc has gone up from last Voc enough to be suspicious. Re-check (Solar mode)",
+    14: "PV input is available but V is rising too slowly. Low Light or bad connection (Solar mode)",
+    15: "Voc has gone down from last Voc or low light. Re-check (Solar mode)",
+    16: "Mppt MODE is OFF (Usually because user turned it off)",
+    17: "PV input is higher than operation range (too high for 150V Classic)",
+    18: "PV input is higher than operation range (too high for 200V Classic)",
+    19: "PV input is higher than operation range (too high for 250V or 250KS)",
+    22: "Average Battery Voltage is too high above set point",
+    25: "Battery Voltage too high of Overshoot (small battery or bad cable ?)",
+    26: "Mode changed while running OR Vabsorb raised more than 10.0 Volts at once OR "
+        "Nominal Vbatt changed by modbus command AND MpptMode was ON when changed",
+    27: "bridge center == 1023 (R132 might have been stuffed) This turns MPPT Mode to OFF",
+    28: "NOT Resting but RELAY is not engaged for some reason",
+    29: "ON/OFF stays off because WIND GRAPH is illegal (current step is set for > 100 amps)",
+    30: "PkAmpsOverLimit... Software detected too high of PEAK output current",
+    31: "AD1CH.IbattMinus > 900 Peak negative battery current > 90.0 amps (Classic 250)",
+    32: "Aux 2 input commanded Classic off. for HI or LO (Aux2Function == 15 or 16)",
+    33: "OCP in a mode other than Solar or PV-Uset",
+    34: "AD1CH.IbattMinus > 900 Peak negative battery current > 90.0 amps (Classic 150, 200)",
+    35: "Battery voltage is less than Low Battery Disconnect (LBD) Typically Vbatt is less than 8.5 volts",
+    104: "104?=14?: PV input is available but V is rising too slowly. Low Light or bad connection (Solar mode)",
+    111: "Normal Power up boot.",
+}
+
+# Home Assistant refuses to store a state longer than 255 characters.
+MAX_STATE_LENGTH = 255
+
+
+def _lookup(table: dict, value, label: str, host: str = "") -> str:
+    """Return table[value], logging a warning and falling back to a readable
+    placeholder when the value is not documented.
+
+    The fallback wording is kept identical to the original standalone script so
+    that unknown codes stay recognisable in the logs and in the HA UI.
+    """
+    try:
+        text = table[value]
+    except KeyError:
+        log.warning(
+            "%s: undefined value %s%s",
+            label,
+            value,
+            f" for host {host}" if host else "",
+        )
+        return f"No text defined for this value...{value}"
+
+    if len(text) > MAX_STATE_LENGTH:
+        text = text[: MAX_STATE_LENGTH - 1] + "\u2026"
+    return text
+
+
+# --------------------------------------------------------------------------- #
 # Based on the address, return the decoded OrderedDict
 #
 # Note that the starting address is the target starting register address minus 1.
@@ -280,33 +446,40 @@ def getRegisters(ip: str, port: int = 502) -> dict:
     else:
         decoded["ChargeStateIcon"] = "mdi:music-rest-whole"
 
-    chrg_stt_txt = {
-        0: "Resting", 3: "Absorb", 4: "Bulk MPPT",
-        5: "Float", 6: "Float MPPT", 7: "Equalize",
-        10: "HyperVOC", 18: "Equalize MPPT",
-    }
-    decoded["ChargeStateText"] = chrg_stt_txt.get(
-        stage, f"Unknown ({stage})"
+    decoded["ChargeStateText"] = _lookup(
+        CHARGE_STAGE_TEXT, stage, "ChargeStateText", ip
     )
 
-    # AUX
+    # ------------------------------------------------------------------ #
+    # AUX 1 / AUX 2 — register 4165 (Aux12Function), Tables 4165-1 … 4165-4
+    #   AUX 1 Off-Auto-On : bits 6,7    Aux1OffAutoOn = (Aux12Function & 0xC0) >> 6
+    #   AUX 1 Function    : bits 0-5    Aux1Function  =  Aux12Function & 0x3F
+    #   AUX 2 Off-Auto-On : bits 14,15  Aux2OffAutoOn = (Aux12Function & 0xC000) >> 14
+    #   AUX 2 Function    : bits 8-13   Aux2Function  = (Aux12Function & 0x3F00) >> 8
+    # ------------------------------------------------------------------ #
     aux12 = decoded.get("Aux12Function", 0)
+
     decoded["Aux1OffAutoOn"] = (aux12 & 0xC0) >> 6
-    decoded["Aux1Function"]  = aux12 & 0x3F
+    decoded["Aux1Function"] = aux12 & 0x3F
     decoded["Aux2OffAutoOn"] = (aux12 & 0xC000) >> 14
-    decoded["Aux2Function"]  = (aux12 & 0x3F00) >> 8
+    decoded["Aux2Function"] = (aux12 & 0x3F00) >> 8
 
-    aux_oa = {0: "AUX Off", 1: "AUX Auto", 2: "AUX On", 3: "Unimplemented"}
-    decoded["Aux1OffAutoOnText"] = aux_oa.get(decoded["Aux1OffAutoOn"], str(decoded["Aux1OffAutoOn"]))
-    decoded["Aux2OffAutoOnText"] = aux_oa.get(decoded["Aux2OffAutoOn"], str(decoded["Aux2OffAutoOn"]))
+    decoded["Aux1FunctionText"] = _lookup(
+        AUX1_FUNCTION_TEXT, decoded["Aux1Function"], "Aux1FunctionText", ip
+    )
+    decoded["Aux1OffAutoOnText"] = _lookup(
+        AUX_OFF_AUTO_ON, decoded["Aux1OffAutoOn"], "Aux1OffAutoOnText", ip
+    )
+    decoded["Aux2FunctionText"] = _lookup(
+        AUX2_FUNCTION_TEXT, decoded["Aux2Function"], "Aux2FunctionText", ip
+    )
+    decoded["Aux2OffAutoOnText"] = _lookup(
+        AUX_OFF_AUTO_ON, decoded["Aux2OffAutoOn"], "Aux2OffAutoOnText", ip
+    )
 
-    # MPPT mode
-    mppt_mode = {
-        0: "PV_Uset", 1: "PV_Uset", 2: "DYNAMIC", 3: "DYNAMIC", 4: "WIND TRACK", 5: "WIND TRACK", 6: "RESERVED", 7: "RESERVED",
-        8: "Legacy P&O", 9: "Legacy P&O", 10: "SOLAR", 11: "SOLAR", 12: "HYDRO", 13: "HYDRO", 14: "RESERVED", 15: "RESERVED",
-    }
-    decoded["MPPTModeText"] = mppt_mode.get(
-        decoded.get("MPPTMode"), f"Unknown ({decoded.get('MPPTMode')})"
+    # MPPT mode — Table 4164-1 (bit 0 = ON/OFF, handled by switch.py)
+    decoded["MPPTModeText"] = _lookup(
+        MPPT_MODE_TEXT, decoded.get("MPPTMode"), "MPPTModeText", ip
     )
 
     # SOC icon
@@ -318,43 +491,12 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         soc_icon = "mdi:battery"
     decoded["SOCicon"] = soc_icon
 
-    # Reason for resting
-    rest_reason = {
-        1: "Anti-Click — not enough power (Wake Up)",
-        2: "Insane Ibatt measurement (Wake Up)",
-        3: "Negative current — load on PV? (Wake Up)",
-        4: "PV voltage lower than battery voltage (Vreg)",
-        5: "Too low power, Vbatt below setpoint >90s",
-        6: "FET temperature too high",
-        7: "Ground fault detected",
-        8: "Arc fault detected",
-        9: "Too much negative current",
-        10: "Battery < 8.0 V",
-        11: "PV voltage rising too slowly (Solar)",
-        12: "Voc decreased from last Voc (Solar)",
-        13: "Voc increased suspiciously (Solar)",
-        16: "MPPT mode OFF",
-        17: "PV input too high (150V Classic)",
-        18: "PV input too high (200V Classic)",
-        19: "PV input too high (250V Classic)",
-        22: "Average battery voltage too high",
-        25: "Battery voltage overshoot",
-        26: "Mode changed while running",
-        27: "Bridge centre == 1023",
-        28: "Not resting but relay not engaged",
-        29: "Wind graph illegal",
-        30: "Peak output current too high",
-        31: "Peak negative battery current > 90A (250)",
-        32: "Aux2 commanded Classic off",
-        33: "OCP in non-Solar mode",
-        34: "Peak negative battery current > 90A (150/200)",
-        35: "Battery below Low Battery Disconnect",
-        104: "PV rising too slowly (Solar)",
-        111: "Normal power-up boot",
-    }
-    idx = decoded.get("ReasonForResting", 0)
-    decoded["ReasonForRestingText"] = rest_reason.get(idx, f"Unknown code: {idx}")
+    # Reason for resting — Table 4275-1
+    decoded["ReasonForRestingText"] = _lookup(
+        REASON_FOR_RESTING_TEXT,
+        decoded.get("ReasonForResting"),
+        "ReasonForRestingText",
+        ip,
+    )
 
     return decoded
-
-

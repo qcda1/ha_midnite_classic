@@ -1,7 +1,7 @@
 """Constants for the Midnite Solar Classic integration."""
 
 DOMAIN = "ha_midnite_classic"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 # Config entry keys
 CONF_HOST = "host"
@@ -88,14 +88,37 @@ PARAMETER_META: dict[str, tuple] = {
     "Name":                    ("Device Name",               None,  None,          None,                 "mdi:tag",                         0, False, None, None, None, None),
     "ChargeStateText":         ("Charge State Text",         None,  None,          None,                 "mdi:battery-charging-outline",    0, False, None, None, None, None),
     "MPPTMode":                ("MPPT Mode",                 None,  None,          None,                 "mdi:sun-wireless",                0, False, None, None, None, None),
-    "Aux1Mode":                ("Aux 1 Mode",                None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
-    "Aux2Mode":                ("Aux 2 Mode",                None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
-    "VbatRegSetpoint":         ("Vbat Reg Setpoint",         "V",   "voltage",     None,                 "mdi:battery-lock",                0, False, None, None, None, None),
-    "BatType":                 ("Battery Type",              None,  None,          None,                 "mdi:battery",                     0, False, None, None, None, None),
-    "AbsorbVoltage":           ("Absorb Voltage",            "V",   "voltage",     None,                 "mdi:battery-arrow-up",            0, False, None, None, None, None),
-    "FloatVoltage":            ("Float Voltage",             "V",   "voltage",     None,                 "mdi:battery-arrow-down",          0, False, None, None, None, None),
     "endingAmps":              ("Absorb End Amps",           "A",   "current",     None,                 "mdi:current-dc",                  1, True,     0, 20,  0.1,   10),
     "ReasonForResting":        ("Reason For Resting",        None,  None,          None,                 "mdi:sleep",                       0, False, None, None, None, None),
+    # --- WhizBang Jr. / battery monitor (registers 4361-4381) ---
+    "SOC":                     ("State Of Charge",           "%",   "battery",     "measurement",        "mdi:battery-heart-variant",       0, False, None, None, None, None),
+    "RemainingAmpHours":       ("Remaining Amp Hours",       "Ah",  None,          "measurement",        "mdi:battery-clock",               0, False, None, None, None, None),
+    "TotalAmpHours":           ("Total Amp Hours",           "Ah",  None,          None,                 "mdi:battery",                     0, False, None, None, None, None),
+    "WhizbangBatCurrent":      ("WhizBang Battery Current",  "A",   "current",     "measurement",        "mdi:current-dc",                  1, False, None, None, None, None),
+    "ShuntTemperature":        ("Shunt Temperature",         "°C",  "temperature", "measurement",        "mdi:thermometer",                 0, False, None, None, None, None),
+    "WbJrAmpHourPOSitive":     ("WBJr Amp Hours Positive",   "Ah",  None,          "total_increasing",   "mdi:battery-plus",                0, False, None, None, None, None),
+    "WbJrAmpHourNEGative":     ("WBJr Amp Hours Negative",   "Ah",  None,          None,                 "mdi:battery-minus",               0, False, None, None, None, None),
+    "WbJrAmpHourNET":          ("WBJr Amp Hours Net",        "Ah",  None,          "measurement",        "mdi:battery-sync",                0, False, None, None, None, None),
+    # --- AUX 1 / AUX 2 decoded from register 4165 (Aux12Function) ---
+    "Aux12Function":           ("Aux 1&2 Function (raw)",    None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
+    "Aux1Function":            ("Aux 1 Function",            None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
+    "Aux1FunctionText":        ("Aux 1 Function Text",       None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
+    "Aux1OffAutoOn":           ("Aux 1 Off/Auto/On",         None,  None,          None,                 "mdi:toggle-switch",               0, False, None, None, None, None),
+    "Aux1OffAutoOnText":       ("Aux 1 Off/Auto/On Text",    None,  None,          None,                 "mdi:toggle-switch",               0, False, None, None, None, None),
+    "Aux2Function":            ("Aux 2 Function",            None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
+    "Aux2FunctionText":        ("Aux 2 Function Text",       None,  None,          None,                 "mdi:electric-switch",             0, False, None, None, None, None),
+    "Aux2OffAutoOn":           ("Aux 2 Off/Auto/On",         None,  None,          None,                 "mdi:toggle-switch",               0, False, None, None, None, None),
+    "Aux2OffAutoOnText":       ("Aux 2 Off/Auto/On Text",    None,  None,          None,                 "mdi:toggle-switch",               0, False, None, None, None, None),
+    # --- Decoded text helpers ---
+    "MPPTModeText":            ("MPPT Mode Text",            None,  None,          None,                 "mdi:sun-wireless",                0, False, None, None, None, None),
+    "ReasonForRestingText":    ("Reason For Resting Text",   None,  None,          None,                 "mdi:sleep",                       0, False, None, None, None, None),
+    # --- Misc device information ---
+    "VbattRegSetPTmpComp":     ("Vbatt Reg Setpoint (TC)",   "V",   "voltage",     "measurement",        "mdi:battery-lock",                1, False, None, None, None, None),
+    "nominalBatteryVoltage":   ("Nominal Battery Voltage",   "V",   "voltage",     None,                 "mdi:battery",                     0, False, None, None, None, None),
+    "app_rev":                 ("Application Revision",      None,  None,          None,                 "mdi:numeric",                     0, False, None, None, None, None),
+    "net_rev":                 ("Network Revision",          None,  None,          None,                 "mdi:numeric",                     0, False, None, None, None, None),
+    "IP":                      ("IP Address",                None,  None,          None,                 "mdi:ip-network",                  0, False, None, None, None, None),
+    "MAC":                     ("MAC Address",               None,  None,          None,                 "mdi:ethernet",                    0, False, None, None, None, None),
     # --- Writable setpoints (number entities) ---
     # Modbus register numbers (not addresses): H4149–H4151, H4162, H4163, H4252
     # Address sent to device = register - 1 (per Modbus spec / Classic manual)
