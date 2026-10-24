@@ -225,3 +225,8 @@ Pour une banque 12 V ou 24 V, divisez les bornes de tension par 4 ou par 2.
 - *Fanions d'état* : les dix fanions sont répartis en deux cartes,
   *Défauts* et *Conditions*.
 - Les sections *Banque de batteries* et *Génératrice* sont identiques.
+
+
+## Exemple de tableau de bord à deux Classic 150
+
+![Tableau de bord](TableauDeBord.png)
