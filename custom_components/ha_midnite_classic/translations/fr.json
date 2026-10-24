@@ -92,7 +92,12 @@
           "app_rev": "Révision application",
           "net_rev": "Révision réseau",
           "IP": "Adresse IP",
-          "MAC": "Adresse MAC"
+          "MAC": "Adresse MAC",
+          "Aux1VoltsLoAbs": "Aux 1 seuil bas",
+          "Aux1VoltsHiAbs": "Aux 1 seuil haut",
+          "Aux1DelayT": "Aux 1 délai d'activation",
+          "Aux1HoldT": "Aux 1 délai de désactivation",
+          "Aux2PwmVwidth": "Aux 2 plage de tension PWM"
         }
       }
     },
@@ -132,6 +137,105 @@
       },
       "endingamps": {
         "name": "Courant fin absorption (Set)"
+      },
+      "aux1voltsloabs": {
+        "name": "Aux 1 seuil bas (Réglage)"
+      },
+      "aux1voltshiabs": {
+        "name": "Aux 1 seuil haut (Réglage)"
+      },
+      "aux1delayt": {
+        "name": "Aux 1 délai d'activation (Réglage)"
+      },
+      "aux1holdt": {
+        "name": "Aux 1 délai de désactivation (Réglage)"
+      }
+    },
+    "select": {
+      "aux1_off_auto_on": {
+        "name": "Mode Aux 1",
+        "state": {
+          "Aux 1 Off": "Aux 1 Off",
+          "Aux 1 Auto": "Aux 1 Auto",
+          "Aux 1 On": "Aux 1 On"
+        }
+      }
+    },
+    "binary_sensor": {
+      "infoflag_aux1stateon": {
+        "name": "Aux 1 actif"
+      },
+      "infoflag_aux2stateon": {
+        "name": "Aux 2 actif"
+      },
+      "infoflag_equalizeinprogress": {
+        "name": "Equalize en cours"
+      },
+      "infoflag_eqdonef": {
+        "name": "Equalize terminé (EqDoneF)"
+      },
+      "infoflag_eqmppt": {
+        "name": "EQ MPPT"
+      },
+      "infoflag_currentlimit": {
+        "name": "Limite de courant"
+      },
+      "infoflag_invislowerthanout": {
+        "name": "V entrée < V sortie"
+      },
+      "infoflag_batterytempsensorinstalled": {
+        "name": "Sonde de température batterie installée"
+      },
+      "infoflag_pvpartialshadef": {
+        "name": "Ombrage partiel PV"
+      },
+      "infoflag_xtrainfo2dsplayf": {
+        "name": "Info supplémentaire disponible"
+      },
+      "infoflag_serialwritelock": {
+        "name": "Écriture Modbus verrouillée"
+      },
+      "infoflag_unlockjumperf": {
+        "name": "Cavalier UN-Lock absent"
+      },
+      "infoflag_xtrajumperf": {
+        "name": "Cavalier Extra absent"
+      },
+      "infoflag_stackumperf": {
+        "name": "Cavalier Stack absent"
+      },
+      "infoflag_watchdogresetf": {
+        "name": "Réinitialisation watchdog"
+      },
+      "infoflag_classicovertemperature": {
+        "name": "Surchauffe du Classic"
+      },
+      "infoflag_eepromerror": {
+        "name": "Erreur EEPROM"
+      },
+      "infoflag_hypervoc": {
+        "name": "HyperVoc"
+      },
+      "infoflag_groundfaultf": {
+        "name": "Défaut de mise à la terre"
+      },
+      "infoflag_ocp": {
+        "name": "Protection surintensité (OCP)"
+      },
+      "infoflag_arcfaultf": {
+        "name": "Défaut d'arc"
+      },
+      "infoflag_negbatcurrentf": {
+        "name": "Courant batterie négatif"
+      },
+      "infoflag_lowbatteryvf": {
+        "name": "Tension batterie très basse"
+      },
+      "infoflag_tempcompshortedf": {
+        "name": "Compensation température en court-circuit"
+      },
+      "infoflag_inputshortedf": {
+        "name": "Entrée PV en court-circuit"
       }
     }
   }

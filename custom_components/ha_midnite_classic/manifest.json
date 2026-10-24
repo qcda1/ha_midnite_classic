@@ -1,10 +1,14 @@
 {
   "domain": "ha_midnite_classic",
   "name": "Midnite Solar Classic",
-  "version": "1.3.0",
+  "version": "1.4.0",
+  "codeowners": ["@qcda1"],
   "config_flow": true,
+  "issue_tracker": "https://github.com/qcda1/ha_midnite_classic/issues",
   "documentation": "https://github.com/qcda1/ha_midnite_classic",
-  "requirements": ["pymodbus>=3.6.0"],
+  "requirements": [
+    "pymodbus>=3.6.0"
+  ],
   "iot_class": "local_polling",
   "integration_type": "device"
 }

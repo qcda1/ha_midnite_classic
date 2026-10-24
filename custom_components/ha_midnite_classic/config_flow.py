@@ -94,7 +94,7 @@ class MidniteClassicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             scan_interval = int(user_input[CONF_SCAN_INTERVAL])
 
             try:
-                data = await async_read_classic(host, port)
+                data = await async_read_classic(host, port, attempts=1)
             except ClassicModuleNotFoundError:
                 errors["base"] = "module_not_found"
                 data = None
@@ -199,7 +199,7 @@ class MidniteClassicOptionsFlowHandler(OptionsFlow):
             )
 
         try:
-            live_data = await async_read_classic(host, port)
+            live_data = await async_read_classic(host, port, attempts=1)
         except ClassicModuleNotFoundError:
             errors["base"] = "module_not_found"
             live_data = None

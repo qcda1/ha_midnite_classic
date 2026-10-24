@@ -15,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .const import (
     CONF_HOST,
@@ -35,6 +36,8 @@ _DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
     "power":       SensorDeviceClass.POWER,
     "energy":      SensorDeviceClass.ENERGY,
     "temperature": SensorDeviceClass.TEMPERATURE,
+    "duration":    SensorDeviceClass.DURATION,
+    "battery":     SensorDeviceClass.BATTERY,
 }
 
 _STATE_CLASS_MAP: dict[str, SensorStateClass] = {
@@ -131,7 +134,9 @@ class MidniteClassicSensor(CoordinatorEntity[MidniteClassicCoordinator], SensorE
         self._attr_icon = icon
         self._device_name = device_name
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_{param_key}"
-        if precision:
+        self.entity_id = f"sensor.{slugify(device_name)}_{slugify(friendly_name)}"
+        is_numeric = unit is not None or state_class is not None
+        if precision is not None and is_numeric:
             self._attr_suggested_display_precision = precision
         self._device_host = host
         self._device_port = port

@@ -30,6 +30,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .classic_writer import write_mppt_onoff
 from .const import CONF_HOST, CONF_PORT, COORDINATOR, DOMAIN
@@ -95,6 +96,7 @@ class MidniteClassicMpptSwitch(
         self._port = port
         self._device_name = device_name
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_mppt_switch"
+        self.entity_id = f"switch.{slugify(device_name)}_{slugify(self._attr_name)}"
 
     @property
     def device_info(self) -> DeviceInfo:

@@ -30,6 +30,21 @@ in its least significant bit (Classic manual Table 4164-1):
 data dict, sets or clears bit 0, and writes the result back to register 4164.
 Using bitwise OR/AND is more robust than ±1 as it is idempotent.
 
+Write flow — AUX 1 Off / Auto / On control
+-------------------------------------------
+Register 4165 (Aux12Function) packs four independent fields into one word
+(Classic manual Tables 4165-1 to 4165-4):
+
+    bits 0-5   Aux1Function
+    bits 6,7   Aux1OffAutoOn      <-- the only field this writer changes
+    bits 8-13  Aux2Function
+    bits 14,15 Aux2OffAutoOn
+
+``write_aux1_off_auto_on()`` therefore performs a read-modify-write: it takes
+the current Aux12Function value from the coordinator data, clears bits 6-7,
+inserts the requested mode, and writes the whole word back. Writing the mode
+value on its own would silently wipe the AUX 1 and AUX 2 function assignments.
+
 Write flow — EEPROM persistence
 ---------------------------------
 The Classic stores writable setpoints in RAM only. Values are lost on device
@@ -54,6 +69,9 @@ from pymodbus.client import AsyncModbusTcpClient
 from pymodbus.exceptions import ModbusException
 
 from .const import (
+    AUX1_OFF_AUTO_ON_MASK,
+    AUX1_OFF_AUTO_ON_SHIFT,
+    AUX12_FUNCTION_REGISTER,
     EEPROM_FORCE_WRITE_HIGH_REG,
     EEPROM_FORCE_WRITE_HIGH_VAL,
     EEPROM_FORCE_WRITE_LOW_REG,
@@ -392,6 +410,122 @@ async def force_eeprom_write(host: str, port: int) -> WriteResult:
             success=False,
             param_key="eeprom",
             raw_value=EEPROM_FORCE_WRITE_LOW_VAL,
+            error=msg,
+        )
+    finally:
+        client.close()
+
+
+async def write_aux1_off_auto_on(
+    host: str,
+    port: int,
+    mode_value: int,
+    current_aux12: int,
+) -> WriteResult:
+    """Set the AUX 1 Off/Auto/On field (bits 6,7) of register 4165.
+
+    This is a read-modify-write against ``current_aux12``: every other field
+    packed into Aux12Function (Aux1Function, Aux2Function, Aux2OffAutoOn) is
+    preserved untouched.
+
+    Parameters
+    ----------
+    host:           IP address of the Classic.
+    port:           Modbus TCP port (normally 502).
+    mode_value:     0 = Aux 1 Off, 1 = Aux 1 Auto, 2 = Aux 1 On
+                    (Classic manual Table 4165-1).
+    current_aux12:  Current raw Aux12Function value from the coordinator data.
+
+    Returns
+    -------
+    ``WriteResult`` with param_key='aux1_off_auto_on'.
+
+    Note
+    ----
+    Register 4165 is marked (EE). The new value applies immediately but is lost
+    on device reboot unless the user presses "Save Settings to EEPROM".
+    """
+
+    if mode_value not in (0, 1, 2):
+        msg = f"Invalid AUX 1 Off/Auto/On value {mode_value} — write refused"
+        _LOGGER.error(msg)
+        return WriteResult(
+            success=False, param_key="aux1_off_auto_on", raw_value=0, error=msg
+        )
+
+    new_value: int = (current_aux12 & ~AUX1_OFF_AUTO_ON_MASK) | (
+        mode_value << AUX1_OFF_AUTO_ON_SHIFT
+    )
+    new_value &= 0xFFFF
+
+    modbus_address: int = AUX12_FUNCTION_REGISTER - 1  # 4164
+
+    _LOGGER.debug(
+        "AUX 1 Off/Auto/On: mode=%d, current Aux12Function=%d (0x%04X) "
+        "→ new=%d (0x%04X), address=%d",
+        mode_value,
+        current_aux12, current_aux12,
+        new_value, new_value,
+        modbus_address,
+    )
+
+    client = AsyncModbusTcpClient(host=host, port=port)
+    try:
+        await client.connect()
+        if not client.connected:
+            msg = f"Could not connect to Classic at {host}:{port} for AUX 1 mode"
+            _LOGGER.error(msg)
+            return WriteResult(
+                success=False,
+                param_key="aux1_off_auto_on",
+                raw_value=new_value,
+                error=msg,
+            )
+
+        response = await client.write_register(
+            address=modbus_address,
+            value=new_value,
+        )
+
+        if response.isError():
+            msg = (
+                f"Modbus error writing AUX 1 mode {mode_value} "
+                f"(register {AUX12_FUNCTION_REGISTER}, raw {new_value}): {response}"
+            )
+            _LOGGER.error(msg)
+            return WriteResult(
+                success=False,
+                param_key="aux1_off_auto_on",
+                raw_value=new_value,
+                error=msg,
+            )
+
+        _LOGGER.info(
+            "AUX 1 Off/Auto/On set to %d successfully (register %d, raw %d)",
+            mode_value,
+            AUX12_FUNCTION_REGISTER,
+            new_value,
+        )
+        return WriteResult(
+            success=True, param_key="aux1_off_auto_on", raw_value=new_value
+        )
+
+    except ModbusException as exc:
+        msg = f"ModbusException writing AUX 1 mode: {exc}"
+        _LOGGER.error(msg)
+        return WriteResult(
+            success=False,
+            param_key="aux1_off_auto_on",
+            raw_value=new_value,
+            error=msg,
+        )
+    except Exception as exc:  # noqa: BLE001
+        msg = f"Unexpected error writing AUX 1 mode: {exc}"
+        _LOGGER.error(msg)
+        return WriteResult(
+            success=False,
+            param_key="aux1_off_auto_on",
+            raw_value=new_value,
             error=msg,
         )
     finally:

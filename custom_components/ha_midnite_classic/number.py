@@ -48,7 +48,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-
+from homeassistant.util import slugify
 from .const import (
     CONF_HOST,
     CONF_PORT,
@@ -182,7 +182,7 @@ class MidniteClassicNumber(CoordinatorEntity[MidniteClassicCoordinator], NumberE
         self._device_host = host
         self._device_port = port
         self._attr_unique_id = f"{DOMAIN}_{entry_id}_{param_key}_number"
-
+        self.entity_id = f"number.{slugify(device_name)}_{slugify(friendly_name)}"
     # ------------------------------------------------------------------
     # Device grouping — same device as the sensor entities
     # ------------------------------------------------------------------

@@ -182,8 +182,93 @@ REASON_FOR_RESTING_TEXT = {
     33: "OCP in a mode other than Solar or PV-Uset",
     34: "AD1CH.IbattMinus > 900 Peak negative battery current > 90.0 amps (Classic 150, 200)",
     35: "Battery voltage is less than Low Battery Disconnect (LBD) Typically Vbatt is less than 8.5 volts",
+    38: "In Follow-Me mode, I was instructed to go to resting state. My partner Classic is taking over.",
     104: "104?=14?: PV input is available but V is rising too slowly. Low Light or bad connection (Solar mode)",
     111: "Normal Power up boot.",
+}
+
+# Table 4130-1 — Info Flag Bits (registers 4130/4131 read as one 32-bit word)
+# READ ONLY. Flag names are reproduced exactly as they appear in the
+# manufacturer documentation; RESERVED bits are intentionally omitted.
+# Format: dict key -> (mask, manufacturer flag name, manufacturer description)
+INFO_FLAG_BITS = {
+    "InfoFlag_ClassicOverTemperature": (
+        0x00000001, "Classic Over Temperature",
+        "Classic Over Temperature if set"),
+    "InfoFlag_EEPROMError": (
+        0x00000002, "EEPROM error",
+        "Classic EEprom read/write found an error if set"),
+    "InfoFlag_SerialWriteLock": (
+        0x00000004, "SerialWriteLock",
+        "Ethernet modbus register change is locked (password)"),
+    "InfoFlag_EqualizeInProgress": (
+        0x00000008, "Equalize In Progress",
+        "Equalize Charge stage Active if set"),
+    "InfoFlag_EQMPPT": (
+        0x00000080, "EQ MPPT",
+        "Battery V is less than EQ Voltage (EQ MPPT)"),
+    "InfoFlag_InVIsLowerThanOut": (
+        0x00000100, "In V is Lower Than Out",
+        "Input Voltage (PV) is lower than Vbatt if set"),
+    "InfoFlag_CurrentLimit": (
+        0x00000200, "Current Limit",
+        "User current limit or internal temperature current limit reached"),
+    "InfoFlag_HyperVoc": (
+        0x00000400, "HyperVoc",
+        "Hyper Voc PV input V is above maximum Classic input rating"),
+    "InfoFlag_BatteryTempSensorInstalled": (
+        0x00002000, "Battery Temp Sensor Installed",
+        "Battery temperature sensor installed if set"),
+    "InfoFlag_Aux1StateOn": (
+        0x00004000, "Aux1 State On",
+        "Aux 1 ON (aux 1 connector has V or relay is closed)"),
+    "InfoFlag_Aux2StateOn": (
+        0x00008000, "Aux2 State On",
+        "Aux 2 ON (aux 2 connector has V present)"),
+    "InfoFlag_GroundFaultF": (
+        0x00010000, "GroundFaultF",
+        "Ground Fault detected if set"),
+    "InfoFlag_OCP": (
+        0x00020000, "OCP (Over Current Protect)",
+        "Hardware Over Current occurred (was DefCon4ErrF)"),
+    "InfoFlag_ArcFaultF": (
+        0x00040000, "ArcFaultF",
+        "Arc Fault occurred if set"),
+    "InfoFlag_NegBatCurrentF": (
+        0x00080000, "NegBatCurrentF",
+        "Negative battery current if set (backfeed out of PV input)"),
+    "InfoFlag_XtraInfo2DsplayF": (
+        0x00200000, "XtraInfo2DsplayF",
+        "Extra info is available to display (Shading, etc)"),
+    "InfoFlag_PvPartialShadeF": (
+        0x00400000, "PvPartialShadeF",
+        "Partial Shade detected during SOLAR sweep (if enabled)"),
+    "InfoFlag_WatchdogResetF": (
+        0x00800000, "WatchdogResetF",
+        "watchdog reset flag indicator (for debugging)"),
+    "InfoFlag_LowBatteryVF": (
+        0x01000000, "LowBatteryVF",
+        "(VERY low battery) Vbatt is lower than 8.0 Volts"),
+    "InfoFlag_StackumperF": (
+        0x02000000, "StackumperF",
+        "Stack Jumper is NOT installed if set"),
+    "InfoFlag_EqDoneF": (
+        0x04000000, "EqDoneF",
+        "EQ Finished. Resets when mode changed or new day"),
+    "InfoFlag_TempCompShortedF": (
+        0x08000000, "TempCompShortedF",
+        "Indication of shorted Temp Comp if set "
+        "(all fans should come on if this is true)"),
+    "InfoFlag_UNLockJumperF": (
+        0x10000000, "UN-LockJumperF",
+        "UN-Lock Jumper NOT installed if set (If Lock Jumper is installed, "
+        "Ethernet write protect is bypassed)"),
+    "InfoFlag_XtraJumperF": (
+        0x20000000, "XtraJumperF",
+        "Extra Jumper is NOT installed if set"),
+    "InfoFlag_InputShortedF": (
+        0x40000000, "InputShortedF",
+        "PV input terminals are less then 1.0 volt if set"),
 }
 
 # Home Assistant refuses to store a state longer than 255 characters.
@@ -311,6 +396,21 @@ def doDecode(addr, decoder):
                 ("EqualizeIntervalDay", decoder.decode_16bit_uint()),  # 4163
                 ("MPPTMode", decoder.decode_16bit_uint()),  # 4164
                 ("Aux12Function", decoder.decode_16bit_uint()),  # 4165
+                # --- AUX 1 thresholds and timings (all EE / writable) -------
+                # 4166/4172 are documented as ([reg] / 10) Volts, but when
+                # Aux1Function is SOC% HIGH/LOW (22/23) they hold a plain
+                # State-Of-Charge percentage instead. Confirmed on a Classic 150
+                # against the MNGP console: register 94 displays as 94, not 9.4.
+                # They are therefore exposed unscaled, in percent.
+                ("Aux1VoltsLoAbs", decoder.decode_16bit_uint()),  # 4166
+                # 4167/4168: the manual says "Milliseconds", but bench testing
+                # against the MNGP console shows the registers hold TENTHS of a
+                # second (register 10 -> 1.0 s, 300 -> 30 s, 6000 -> 10 min).
+                ("Aux1DelayT", decoder.decode_16bit_uint() / 10.0),  # 4167
+                ("Aux1HoldT", decoder.decode_16bit_uint() / 10.0),  # 4168
+                ("Aux2PwmVwidth", decoder.decode_16bit_uint()),  # 4169
+                ("skip4161", decoder.skip_bytes(4)),  # 4170, 4171 RESERVED
+                ("Aux1VoltsHiAbs", decoder.decode_16bit_uint()),  # 4172
             ]
         )
     elif addr == 4209:
@@ -388,7 +488,7 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         raw[4100]  = _readRegisters(client, 4100,  44)
         raw[4360]  = _readRegisters(client, 4360,  22)
         raw[4148]  = _readRegisters(client, 4148,   3)
-        raw[4161]  = _readRegisters(client, 4161,   4)
+        raw[4161]  = _readRegisters(client, 4161,  11)   # 4162 → 4172 (AUX 1 setpoints)
         raw[4209]  = _readRegisters(client, 4209,   4)
         raw[4213]  = _readRegisters(client, 4213,   6)
         raw[4243]  = _readRegisters(client, 4243,  32)
@@ -498,5 +598,22 @@ def getRegisters(ip: str, port: int = 502) -> dict:
         "ReasonForRestingText",
         ip,
     )
+
+    # ------------------------------------------------------------------ #
+    # Info Flag Bits — Table 4130-1
+    # The 32-bit word decoded from registers 4130/4131 is exploded into one
+    # boolean per documented flag. "InfoFlagsBits" itself is left untouched so
+    # existing sensors, templates and automations keep working.
+    # ------------------------------------------------------------------ #
+    info_flags = decoded.get("InfoFlagsBits")
+    try:
+        info_flags = int(info_flags)
+    except (TypeError, ValueError):
+        log.warning("InfoFlagsBits unavailable or not an integer: %r", info_flags)
+        info_flags = None
+
+    if info_flags is not None:
+        for flag_key, (mask, _name, _description) in INFO_FLAG_BITS.items():
+            decoded[flag_key] = bool(info_flags & mask)
 
     return decoded

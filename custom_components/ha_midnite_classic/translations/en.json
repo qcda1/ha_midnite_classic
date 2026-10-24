@@ -92,7 +92,12 @@
           "app_rev": "Application Revision",
           "net_rev": "Network Revision",
           "IP": "IP Address",
-          "MAC": "MAC Address"
+          "MAC": "MAC Address",
+          "Aux1VoltsLoAbs": "Aux 1 Low Threshold",
+          "Aux1VoltsHiAbs": "Aux 1 High Threshold",
+          "Aux1DelayT": "Aux 1 Delay Time",
+          "Aux1HoldT": "Aux 1 Hold Time",
+          "Aux2PwmVwidth": "Aux 2 PWM Voltage Width"
         }
       }
     },
@@ -132,6 +137,105 @@
       },
       "endingamps": {
         "name": "Ending Amps (Set)"
+      },
+      "aux1voltsloabs": {
+        "name": "Aux 1 Low Threshold (Set)"
+      },
+      "aux1voltshiabs": {
+        "name": "Aux 1 High Threshold (Set)"
+      },
+      "aux1delayt": {
+        "name": "Aux 1 Delay Time (Set)"
+      },
+      "aux1holdt": {
+        "name": "Aux 1 Hold Time (Set)"
+      }
+    },
+    "select": {
+      "aux1_off_auto_on": {
+        "name": "Aux 1 Mode",
+        "state": {
+          "Aux 1 Off": "Aux 1 Off",
+          "Aux 1 Auto": "Aux 1 Auto",
+          "Aux 1 On": "Aux 1 On"
+        }
+      }
+    },
+    "binary_sensor": {
+      "infoflag_aux1stateon": {
+        "name": "Aux 1 State On"
+      },
+      "infoflag_aux2stateon": {
+        "name": "Aux 2 State On"
+      },
+      "infoflag_equalizeinprogress": {
+        "name": "Equalize In Progress"
+      },
+      "infoflag_eqdonef": {
+        "name": "EqDoneF"
+      },
+      "infoflag_eqmppt": {
+        "name": "EQ MPPT"
+      },
+      "infoflag_currentlimit": {
+        "name": "Current Limit"
+      },
+      "infoflag_invislowerthanout": {
+        "name": "In V is Lower Than Out"
+      },
+      "infoflag_batterytempsensorinstalled": {
+        "name": "Battery Temp Sensor Installed"
+      },
+      "infoflag_pvpartialshadef": {
+        "name": "PvPartialShadeF"
+      },
+      "infoflag_xtrainfo2dsplayf": {
+        "name": "XtraInfo2DsplayF"
+      },
+      "infoflag_serialwritelock": {
+        "name": "SerialWriteLock"
+      },
+      "infoflag_unlockjumperf": {
+        "name": "UN-LockJumperF"
+      },
+      "infoflag_xtrajumperf": {
+        "name": "XtraJumperF"
+      },
+      "infoflag_stackumperf": {
+        "name": "StackumperF"
+      },
+      "infoflag_watchdogresetf": {
+        "name": "WatchdogResetF"
+      },
+      "infoflag_classicovertemperature": {
+        "name": "Classic Over Temperature"
+      },
+      "infoflag_eepromerror": {
+        "name": "EEPROM error"
+      },
+      "infoflag_hypervoc": {
+        "name": "HyperVoc"
+      },
+      "infoflag_groundfaultf": {
+        "name": "GroundFaultF"
+      },
+      "infoflag_ocp": {
+        "name": "OCP (Over Current Protect)"
+      },
+      "infoflag_arcfaultf": {
+        "name": "ArcFaultF"
+      },
+      "infoflag_negbatcurrentf": {
+        "name": "NegBatCurrentF"
+      },
+      "infoflag_lowbatteryvf": {
+        "name": "LowBatteryVF"
+      },
+      "infoflag_tempcompshortedf": {
+        "name": "TempCompShortedF"
+      },
+      "infoflag_inputshortedf": {
+        "name": "InputShortedF"
       }
     }
   }
