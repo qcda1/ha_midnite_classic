@@ -1,0 +1,1031 @@
+title: Classic
+views:
+  - title: Console
+    path: console
+    icon: mdi:solar-power-variant
+    type: panel
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: >
+              ## MIDNITE CLASSIC
+
+
+              {% set p = states('sensor.classic1_power') | float(0) %}
+
+              {% set soc = states('sensor.classic1_state_of_charge') | float(0) %}
+
+              {% set gen = states('binary_sensor.classic1_aux_1_state_on') %}
+
+              {%- if gen == 'on' -%}GÉNÉRATRICE EN MARCHE
+
+              {%- elif p > 50 -%}RÉCOLTE EN COURS
+
+              {%- else -%}REPOS{%- endif -%}
+
+              &nbsp;·&nbsp; BATT {{ soc | round(0) }} %
+
+              &nbsp;·&nbsp; {{ p | round(0) }} W
+
+              &nbsp;·&nbsp; {{ states('sensor.classic1_charge_state_text') |
+              upper }}
+            card_mod:
+              style:
+                ha-markdown:
+                  $: |
+                    h2 {
+                      font-size: 15px !important;
+                      letter-spacing: 0.34em !important;
+                      text-transform: uppercase;
+                      color: var(--classic-phosphor, #7FE3C4) !important;
+                      font-weight: 400 !important;
+                      margin: 0 0 6px 0 !important;
+                    }
+                    p {
+                      font-family: var(--classic-mono);
+                      font-size: 12px !important;
+                      letter-spacing: 0.14em;
+                      color: var(--secondary-text-color) !important;
+                      margin: 0 !important;
+                    }
+                .: |
+                  ha-card {
+                    background: linear-gradient(180deg,
+                      rgba(127,227,196,0.07) 0%, rgba(13,22,32,0) 70%),
+                      var(--classic-panel, #0D1620);
+                    border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    border-left: 2px solid var(--classic-phosphor, #7FE3C4);
+                    padding: 14px 18px;
+                  }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: |
+                  ## {{ states('sensor.classic1_device_name') }}
+                card_mod:
+                  style:
+                    ha-markdown:
+                      $: |
+                        h2 {
+                          font-size: 12px !important;
+                          letter-spacing: 0.26em !important;
+                          font-weight: 400 !important;
+                          text-transform: uppercase;
+                          color: var(--classic-phosphor, #7FE3C4) !important;
+                          margin: 0 !important;
+                        }
+                    .: |
+                      ha-card {
+                        background: var(--classic-panel, #0D1620);
+                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                        border-bottom: none;
+                        padding: 10px 16px 8px 16px;
+                      }
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.classic1_power
+                    name: PUISSANCE
+                    unit: W
+                    min: 0
+                    max: 1400
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 900
+                      red: 1200
+                    card_mod:
+                      style: |
+                        ha-card {
+                          position: relative;
+                          background: linear-gradient(180deg,
+                            rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                            var(--classic-panel, #0D1620);
+                          border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                        }
+                        ha-card::before, ha-card::after {
+                          content: ""; position: absolute;
+                          width: 9px; height: 9px;
+                          border-color: var(--classic-phosphor, #7FE3C4);
+                          opacity: 0.45; pointer-events: none;
+                        }
+                        ha-card::before {
+                          top: 0; left: 0;
+                          border-top: 1px solid; border-left: 1px solid;
+                        }
+                        ha-card::after {
+                          bottom: 0; right: 0;
+                          border-bottom: 1px solid; border-right: 1px solid;
+                        }
+                  - type: markdown
+                    content: >
+                      {% set p = states('sensor.classic1_power') |
+                      float(0) %}
+
+                      {% set r = states('sensor.classic1_energy_today') |
+                      float(0) %}
+
+                      {% set pmax = 1400 %}
+
+                      {% set rmax = 15 %}
+
+                      # {{ p | round(0) }} W
+
+
+                      {{ (100 * p / pmax) | round(0) }} % DE {{ pmax }} W
+
+
+                      RÉCOLTE JOUR {{ r }} kWh · {{ (100 * r / rmax) | round(0) }} %
+                      DE {{ rmax }} kWh
+
+
+                      CUMUL {{ states('sensor.classic1_total_energy') }} kWh
+                    card_mod:
+                      style:
+                        ha-markdown:
+                          $: |
+                            h1 {
+                              font-family: var(--classic-mono);
+                              font-size: 46px !important;
+                              line-height: 1 !important;
+                              font-weight: 300 !important;
+                              letter-spacing: -0.01em;
+                              color: var(--classic-phosphor, #7FE3C4) !important;
+                              text-align: center;
+                              margin: 0 0 10px 0 !important;
+                              text-shadow: 0 0 22px rgba(127,227,196,0.35);
+                            }
+                            p {
+                              font-family: var(--classic-mono);
+                              font-size: 14px !important;
+                              line-height: 1.5 !important;
+                              letter-spacing: 0.10em;
+                              text-align: center;
+                              color: #CFEDE4 !important;
+                              margin: 0 0 8px 0 !important;
+                            }
+                            p:last-of-type { margin-bottom: 0 !important; }
+                        .: |
+                          ha-card {
+                            background: var(--classic-panel, #0D1620);
+                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                            border-top: 2px solid var(--classic-phosphor, #7FE3C4);
+                            padding: 40px 16px;
+                          }
+                  - type: markdown
+                    content: |
+                      **CONTRÔLEUR**
+
+                      ÉTAGE `{{ states('sensor.classic1_charge_state_text') }}`
+
+                      MPPT `{{ states('sensor.classic1_mppt_mode_text') }}`
+
+                      FET `{{ states('sensor.classic1_fet_temperature') }} °C`
+                    card_mod:
+                      style:
+                        ha-markdown:
+                          $: |
+                            p {
+                              display: flex;
+                              align-items: baseline;
+                              justify-content: space-between;
+                              gap: 12px;
+                              white-space: nowrap;
+                              font-size: 11.5px !important;
+                              letter-spacing: 0.08em;
+                              color: var(--secondary-text-color) !important;
+                              margin: 0 0 6px 0 !important;
+                            }
+                            p:first-of-type {
+                              display: block;
+                              font-size: 10px !important;
+                              letter-spacing: 0.22em;
+                              color: var(--classic-pixel, #4B4FC4) !important;
+                              margin-bottom: 12px !important;
+                            }
+                            p:last-of-type { margin-bottom: 0 !important; }
+                            strong { font-weight: 400 !important; }
+                            code {
+                              font-family: var(--classic-mono);
+                              background: rgba(127,227,196,0.07) !important;
+                              color: var(--classic-phosphor, #7FE3C4) !important;
+                              padding: 1px 6px !important;
+                              border-radius: 2px;
+                              /* La valeur peut rétrécir et se couper plutôt
+                                 que de déborder : « Reason For Resting » peut
+                                 faire 149 caractères. */
+                              flex: 0 1 auto;
+                              min-width: 0;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                            }
+                        .: |
+                          ha-card {
+                            background: var(--classic-panel, #0D1620);
+                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                            padding: 12px 16px;
+                          }
+          - type: markdown
+            content: '## BANQUE DE BATTERIES · REG 4360-4383'
+            card_mod:
+              style:
+                ha-markdown:
+                  $: |
+                    h2 {
+                      font-size: 11px !important;
+                      letter-spacing: 0.30em !important;
+                      font-weight: 400 !important;
+                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
+                      margin: 0 !important;
+                      text-transform: uppercase;
+                    }
+                .: |
+                  ha-card {
+                    background: transparent;
+                    border: none;
+                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    box-shadow: none;
+                    padding: 18px 4px 6px 4px;
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.classic1_state_of_charge
+                name: ÉTAT DE CHARGE
+                unit: '%'
+                min: 0
+                max: 100
+                needle: true
+                severity:
+                  red: 0
+                  yellow: 50
+                  green: 80
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+              - type: gauge
+                entity: sensor.classic1_battery_voltage
+                name: TENSION BATT
+                unit: V
+                min: 44
+                max: 62
+                needle: true
+                severity:
+                  red: 44
+                  yellow: 47
+                  green: 50
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+              - type: gauge
+                entity: sensor.classic1_whizbang_battery_current
+                name: COURANT BATT
+                unit: A
+                min: -150
+                max: 150
+                needle: true
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+              - type: markdown
+                content: >
+                  **BILAN WHIZBANG JR**
+
+
+                  SENS `{{ states('sensor.banque_sens_du_courant') }}`
+
+
+                  PUISSANCE `{{ states('sensor.banque_puissance_nette') }} W`
+
+
+                  Ah RESTE `{{ states('sensor.classic1_remaining_amp_hours') }}
+                  Ah`
+
+
+                  Ah TOTAL `{{ states('sensor.classic1_total_amp_hours') }} Ah`
+
+
+                  Ah NET `{{ states('sensor.classic1_wbjr_amp_hours_net') }} Ah`
+
+
+                  ENTRÉE `{{ states('sensor.banque_energie_accumulee') }} kWh`
+
+
+                  SORTIE `{{ states('sensor.banque_energie_fournie') }} kWh`
+
+
+                  TEMP. `{{ states('sensor.classic1_battery_temperature') }} °C`
+                card_mod:
+                  style:
+                    ha-markdown:
+                      $: |
+                        p {
+                          display: flex;
+                          align-items: baseline;
+                          justify-content: space-between;
+                          gap: 12px;
+                          white-space: nowrap;
+                          font-size: 11.5px !important;
+                          letter-spacing: 0.08em;
+                          color: var(--secondary-text-color) !important;
+                          margin: 0 0 6px 0 !important;
+                        }
+                        p:first-of-type {
+                          display: block;
+                          font-size: 10px !important;
+                          letter-spacing: 0.22em;
+                          color: var(--classic-pixel, #4B4FC4) !important;
+                          margin-bottom: 12px !important;
+                        }
+                        p:last-of-type { margin-bottom: 0 !important; }
+                        strong { font-weight: 400 !important; }
+                        code {
+                          font-family: var(--classic-mono);
+                          background: rgba(127,227,196,0.07) !important;
+                          color: var(--classic-phosphor, #7FE3C4) !important;
+                          padding: 1px 6px !important;
+                          border-radius: 2px;
+                          /* La valeur peut rétrécir et se couper plutôt
+                             que de déborder : « Reason For Resting » peut
+                             faire 149 caractères. */
+                          flex: 0 1 auto;
+                          min-width: 0;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                    .: |
+                      ha-card {
+                        background: var(--classic-panel, #0D1620);
+                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                        padding: 12px 16px;
+                      }
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: ÉTAT DE CHARGE ET COURANT BATT
+              show_states: false
+            graph_span: 24h
+            span:
+              end: minute
+            apex_config:
+              chart:
+                height: 220
+                background: transparent
+              grid:
+                borderColor: rgba(75,79,196,0.20)
+                strokeDashArray: 3
+              legend:
+                show: true
+                position: top
+                horizontalAlign: right
+              yaxis:
+                - id: soc
+                  min: 0
+                  max: 100
+                  decimalsInFloat: 0
+                  title:
+                    text: '%'
+                - id: courant
+                  opposite: true
+                  decimalsInFloat: 0
+                  title:
+                    text: A
+            series:
+              - entity: sensor.classic1_state_of_charge
+                name: État de charge
+                yaxis_id: soc
+                type: line
+                curve: smooth
+                stroke_width: 2
+                color: '#7FE3C4'
+              - entity: sensor.classic1_whizbang_battery_current
+                name: Courant batt
+                yaxis_id: courant
+                type: area
+                curve: smooth
+                opacity: 0.18
+                stroke_width: 1
+                color: '#8B8FF0'
+            card_mod:
+              style: |
+                ha-card {
+                  position: relative;
+                  background: linear-gradient(180deg,
+                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                    var(--classic-panel, #0D1620);
+                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                }
+                ha-card::before, ha-card::after {
+                  content: ""; position: absolute;
+                  width: 9px; height: 9px;
+                  border-color: var(--classic-phosphor, #7FE3C4);
+                  opacity: 0.45; pointer-events: none;
+                }
+                ha-card::before {
+                  top: 0; left: 0;
+                  border-top: 1px solid; border-left: 1px solid;
+                }
+                ha-card::after {
+                  bottom: 0; right: 0;
+                  border-bottom: 1px solid; border-right: 1px solid;
+                }
+          - type: markdown
+            content: '## GÉNÉRATRICE · AUX 1 · REG 4165 · 4166 · 4167 · 4168 · 4172'
+            card_mod:
+              style:
+                ha-markdown:
+                  $: |
+                    h2 {
+                      font-size: 11px !important;
+                      letter-spacing: 0.30em !important;
+                      font-weight: 400 !important;
+                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
+                      margin: 0 !important;
+                      text-transform: uppercase;
+                    }
+                .: |
+                  ha-card {
+                    background: transparent;
+                    border: none;
+                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    box-shadow: none;
+                    padding: 18px 4px 6px 4px;
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: markdown
+                content: >
+                  # {{ states('sensor.generatrice_statut') | upper }}
+
+
+                  {% set m = states('sensor.generatrice_marge_avant_demarrage')
+                  | float(0) %}
+
+                  {%- if states('binary_sensor.classic1_aux_1_state_on') == 'on'
+                  -%}
+
+                  Le relais est fermé. Arrêt lorsque l'état de charge dépasse
+
+                  {{ states('sensor.classic1_aux_1_high_threshold') }} %,
+
+                  puis {{ states('sensor.classic1_aux_1_delay_time') }} s de
+                  délai.
+
+                  {%- else -%}
+
+                  Marge avant démarrage : {{ m | round(0) }} points d'état de
+                  charge.
+
+                  Sous le seuil, le Classic attend
+
+                  {{ states('sensor.classic1_aux_1_hold_time') }} s
+
+                  avant de fermer le relais.
+
+                  {%- endif -%}
+                card_mod:
+                  style:
+                    ha-markdown:
+                      $: |
+                        h1 {
+                          font-family: var(--classic-mono);
+                          font-size: 26px !important;
+                          font-weight: 300 !important;
+                          letter-spacing: 0.06em;
+                          color: var(--classic-amber, #FFB03A) !important;
+                          margin: 0 0 10px 0 !important;
+                          text-shadow: 0 0 18px rgba(255,176,58,0.30);
+                        }
+                        p {
+                          font-size: 12px !important;
+                          line-height: 1.6 !important;
+                          color: var(--secondary-text-color) !important;
+                          margin: 0 !important;
+                        }
+                    .: |
+                      ha-card {
+                        background: linear-gradient(180deg,
+                          rgba(255,176,58,0.06) 0%, rgba(13,22,32,0) 60%),
+                          var(--classic-panel, #0D1620);
+                        border: 1px solid rgba(255,176,58,0.22);
+                        border-left: 2px solid var(--classic-amber, #FFB03A);
+                        padding: 16px 18px;
+                      }
+              - type: markdown
+                content: >
+                  **GÉNÉRATRICE**
+
+                  **CONSIGNES ET COMPTEURS**
+
+
+                  SEUIL BAS `{{ states('sensor.classic1_aux_1_low_threshold') }}
+                  %`
+
+
+                  SEUIL HAUT `{{ states('sensor.classic1_aux_1_high_threshold')
+                  }} %`
+
+
+                  DÉLAI ARRÊT `{{ states('sensor.classic1_aux_1_delay_time') }}
+                  s`
+
+
+                  DÉLAI DÉMARR. `{{ states('sensor.classic1_aux_1_hold_time') }}
+                  s`
+
+
+                  FONCTION `{{ states('sensor.classic1_aux_1_function_text') }}`
+
+
+                  MARCHE JOUR `{{
+                  states('sensor.generatrice_marche_aujourd_hui') | float(0) |
+                  round(1) }} h`
+
+
+                  MARCHE 7 J `{{ states('sensor.generatrice_marche_7_jours') |
+                  float(0) | round(1) }} h`
+
+
+                  DÉMARRAGES `{{
+                  states('sensor.generatrice_demarrages_aujourd_hui') }}`
+                card_mod:
+                  style:
+                    ha-markdown:
+                      $: |
+                        p {
+                          display: flex;
+                          align-items: baseline;
+                          justify-content: space-between;
+                          gap: 12px;
+                          white-space: nowrap;
+                          font-size: 11.5px !important;
+                          letter-spacing: 0.08em;
+                          color: var(--secondary-text-color) !important;
+                          margin: 0 0 6px 0 !important;
+                        }
+                        p:first-of-type {
+                          display: block;
+                          font-size: 10px !important;
+                          letter-spacing: 0.22em;
+                          color: var(--classic-pixel, #4B4FC4) !important;
+                          margin-bottom: 12px !important;
+                        }
+                        p:last-of-type { margin-bottom: 0 !important; }
+                        strong { font-weight: 400 !important; }
+                        code {
+                          font-family: var(--classic-mono);
+                          background: rgba(127,227,196,0.07) !important;
+                          color: var(--classic-phosphor, #7FE3C4) !important;
+                          padding: 1px 6px !important;
+                          border-radius: 2px;
+                          /* La valeur peut rétrécir et se couper plutôt
+                             que de déborder : « Reason For Resting » peut
+                             faire 149 caractères. */
+                          flex: 0 1 auto;
+                          min-width: 0;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                    .: |
+                      ha-card {
+                        background: var(--classic-panel, #0D1620);
+                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                        padding: 12px 16px;
+                      }
+              - type: entities
+                title: COMMANDE AUX 1
+                show_header_toggle: false
+                entities:
+                  - entity: select.classic1_aux_1_mode
+                    name: Mode
+                  - entity: number.classic1_aux_1_low_threshold_set
+                    name: Seuil bas
+                  - entity: number.classic1_aux_1_high_threshold_set
+                    name: Seuil haut
+                  - entity: number.classic1_aux_1_delay_time_set
+                    name: Délai arrêt
+                  - entity: number.classic1_aux_1_hold_time_set
+                    name: Délai démarrage
+                  - type: divider
+                  - entity: button.classic1_save_settings_to_eeprom
+                    name: Écrire en EEPROM
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: ÉTAT DE CHARGE CONTRE SEUILS AUX 1
+              show_states: false
+            graph_span: 48h
+            span:
+              end: minute
+            apex_config:
+              chart:
+                height: 260
+                background: transparent
+              grid:
+                borderColor: rgba(75,79,196,0.20)
+                strokeDashArray: 3
+              legend:
+                show: true
+                position: top
+                horizontalAlign: right
+              stroke:
+                dashArray:
+                  - 0
+                  - 0
+                  - 6
+                  - 6
+              yaxis:
+                - min: 0
+                  max: 100
+                  decimalsInFloat: 0
+                  title:
+                    text: '%'
+            series:
+              - entity: sensor.classic1_state_of_charge
+                name: État de charge
+                type: line
+                curve: smooth
+                stroke_width: 2
+                color: '#7FE3C4'
+              - entity: binary_sensor.classic1_aux_1_state_on
+                name: Génératrice
+                type: area
+                curve: stepline
+                opacity: 0.22
+                stroke_width: 1
+                color: '#FFB03A'
+                transform: 'return x === ''on'' ? 100 : 0;'
+              - entity: sensor.classic1_aux_1_high_threshold
+                name: Seuil haut
+                type: line
+                curve: stepline
+                stroke_width: 2
+                color: '#FFB03A'
+                extend_to: now
+              - entity: sensor.classic1_aux_1_low_threshold
+                name: Seuil bas
+                type: line
+                curve: stepline
+                stroke_width: 2
+                color: '#FF5A52'
+                extend_to: now
+            card_mod:
+              style: |
+                ha-card {
+                  position: relative;
+                  background: linear-gradient(180deg,
+                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                    var(--classic-panel, #0D1620);
+                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                }
+                ha-card::before, ha-card::after {
+                  content: ""; position: absolute;
+                  width: 9px; height: 9px;
+                  border-color: var(--classic-phosphor, #7FE3C4);
+                  opacity: 0.45; pointer-events: none;
+                }
+                ha-card::before {
+                  top: 0; left: 0;
+                  border-top: 1px solid; border-left: 1px solid;
+                }
+                ha-card::after {
+                  bottom: 0; right: 0;
+                  border-bottom: 1px solid; border-right: 1px solid;
+                }
+          - type: logbook
+            target:
+              entity_id:
+                - binary_sensor.classic1_aux_1_state_on
+            hours_to_show: 72
+            card_mod:
+              style: |
+                ha-card {
+                  position: relative;
+                  background: linear-gradient(180deg,
+                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                    var(--classic-panel, #0D1620);
+                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                }
+                ha-card::before, ha-card::after {
+                  content: ""; position: absolute;
+                  width: 9px; height: 9px;
+                  border-color: var(--classic-phosphor, #7FE3C4);
+                  opacity: 0.45; pointer-events: none;
+                }
+                ha-card::before {
+                  top: 0; left: 0;
+                  border-top: 1px solid; border-left: 1px solid;
+                }
+                ha-card::after {
+                  bottom: 0; right: 0;
+                  border-bottom: 1px solid; border-right: 1px solid;
+                }
+          - type: markdown
+            content: '## CHAÎNES PHOTOVOLTAÏQUES · REG 4115 · 4121 · 4136'
+            card_mod:
+              style:
+                ha-markdown:
+                  $: |
+                    h2 {
+                      font-size: 11px !important;
+                      letter-spacing: 0.30em !important;
+                      font-weight: 400 !important;
+                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
+                      margin: 0 !important;
+                      text-transform: uppercase;
+                    }
+                .: |
+                  ha-card {
+                    background: transparent;
+                    border: none;
+                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    box-shadow: none;
+                    padding: 18px 4px 6px 4px;
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: markdown
+                content: >
+                  **{{ states('sensor.classic1_device_name') }}**
+
+
+                  TENSION PV `{{ states('sensor.classic1_pv_voltage') }} V`
+
+
+                  COURANT PV `{{ states('sensor.classic1_pv_current') }} A`
+
+
+                  DERNIER VOC `{{ states('sensor.classic1_last_voc') }} V`
+
+
+                  COURANT BATT `{{ states('sensor.classic1_battery_current') }}
+                  A`
+
+
+                  STATUT `{% if is_state('sensor.classic1_charge_state_text', 'Resting') %}{{ states('sensor.classic1_reason_for_resting_text') }}{% else %}En opération{% endif %}`
+                card_mod:
+                  style:
+                    ha-markdown:
+                      $: |
+                        p {
+                          display: flex;
+                          align-items: baseline;
+                          justify-content: space-between;
+                          gap: 12px;
+                          white-space: nowrap;
+                          font-size: 11.5px !important;
+                          letter-spacing: 0.08em;
+                          color: var(--secondary-text-color) !important;
+                          margin: 0 0 6px 0 !important;
+                        }
+                        p:first-of-type {
+                          display: block;
+                          font-size: 10px !important;
+                          letter-spacing: 0.22em;
+                          color: var(--classic-pixel, #4B4FC4) !important;
+                          margin-bottom: 12px !important;
+                        }
+                        p:last-of-type { margin-bottom: 0 !important; }
+                        strong { font-weight: 400 !important; }
+                        code {
+                          font-family: var(--classic-mono);
+                          background: rgba(127,227,196,0.07) !important;
+                          color: var(--classic-phosphor, #7FE3C4) !important;
+                          padding: 1px 6px !important;
+                          border-radius: 2px;
+                          /* La valeur peut rétrécir et se couper plutôt
+                             que de déborder : « Reason For Resting » peut
+                             faire 149 caractères. */
+                          flex: 0 1 auto;
+                          min-width: 0;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                    .: |
+                      ha-card {
+                        background: var(--classic-panel, #0D1620);
+                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                        padding: 12px 16px;
+                      }
+              - type: custom:apexcharts-card
+                header:
+                  show: true
+                  title: PUISSANCE 24 H
+                  show_states: false
+                graph_span: 24h
+                span:
+                  end: minute
+                apex_config:
+                  chart:
+                    height: 200
+                    background: transparent
+                  grid:
+                    borderColor: rgba(75,79,196,0.20)
+                    strokeDashArray: 3
+                  legend:
+                    show: true
+                    position: top
+                    horizontalAlign: right
+                series:
+                  - entity: sensor.classic1_power
+                    name: Puissance
+                    type: area
+                    curve: smooth
+                    opacity: 0.35
+                    stroke_width: 1
+                    color: '#7FE3C4'
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+          - type: markdown
+            content: '## FANIONS D''ÉTAT · REG 4130'
+            card_mod:
+              style:
+                ha-markdown:
+                  $: |
+                    h2 {
+                      font-size: 11px !important;
+                      letter-spacing: 0.30em !important;
+                      font-weight: 400 !important;
+                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
+                      margin: 0 !important;
+                      text-transform: uppercase;
+                    }
+                .: |
+                  ha-card {
+                    background: transparent;
+                    border: none;
+                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    box-shadow: none;
+                    padding: 18px 4px 6px 4px;
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: DÉFAUTS
+                show_header_toggle: false
+                entities:
+                  - binary_sensor.classic1_classic_over_temperature
+                  - binary_sensor.classic1_groundfaultf
+                  - binary_sensor.classic1_arcfaultf
+                  - binary_sensor.classic1_ocp_over_current_protect
+                  - binary_sensor.classic1_lowbatteryvf
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }
+              - type: entities
+                title: CONDITIONS
+                show_header_toggle: false
+                entities:
+                  - binary_sensor.classic1_hypervoc
+                  - binary_sensor.classic1_current_limit
+                  - binary_sensor.classic1_pvpartialshadef
+                  - binary_sensor.classic1_equalize_in_progress
+                  - binary_sensor.classic1_battery_temp_sensor_installed
+                card_mod:
+                  style: |
+                    ha-card {
+                      position: relative;
+                      background: linear-gradient(180deg,
+                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
+                        var(--classic-panel, #0D1620);
+                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
+                    }
+                    ha-card::before, ha-card::after {
+                      content: ""; position: absolute;
+                      width: 9px; height: 9px;
+                      border-color: var(--classic-phosphor, #7FE3C4);
+                      opacity: 0.45; pointer-events: none;
+                    }
+                    ha-card::before {
+                      top: 0; left: 0;
+                      border-top: 1px solid; border-left: 1px solid;
+                    }
+                    ha-card::after {
+                      bottom: 0; right: 0;
+                      border-bottom: 1px solid; border-right: 1px solid;
+                    }

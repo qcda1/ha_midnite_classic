@@ -1,4 +1,8 @@
-# Classic Console — entités dérivées.  Révision 3.
+# Classic Console — entités dérivées.  Révision 4.
+#
+# Révision 4 — `sensor.classic1_soc` remplacé par
+# `sensor.classic1_state_of_charge`, le nom réellement créé par
+# l'intégration ha_midnite_classic (paramètre SOC → « State Of Charge »).
 #
 # Révision 3 — ajout des clauses `availability:` sur tous les capteurs
 # dérivés.
@@ -87,7 +91,7 @@ template:
             + states('sensor.classic2_total_energy') | float(0)) | round(1) }}
 
       # --- Banque de batteries -------------------------------------------
-      # Le WhizBang Jr voit le courant réel du parc (charge moins
+      # Le WhizBang Jr voit le courant réel de la banque (charge moins
       # consommation), contrairement au courant batterie de chaque Classic.
       - name: "Banque Puissance nette"
         unique_id: banque_puissance_nette
@@ -112,7 +116,7 @@ template:
           {% set i = states('sensor.classic1_whizbang_battery_current') | float(0) %}
           {% if i > 0.5 %}Charge
           {% elif i < -0.5 %}Décharge
-          {% else %}Repos
+          {% else %}Équilibre
           {% endif %}
 
       - name: "Banque Énergie accumulée"
@@ -148,10 +152,10 @@ template:
         state_class: measurement
         icon: mdi:gauge-low
         availability: >
-          {{ has_value('sensor.classic1_soc')
+          {{ has_value('sensor.classic1_state_of_charge')
              and has_value('sensor.classic1_aux_1_low_threshold') }}
         state: >
-          {{ (states('sensor.classic1_soc') | float(0)
+          {{ (states('sensor.classic1_state_of_charge') | float(0)
             - states('sensor.classic1_aux_1_low_threshold') | float(0))
             | round(0) }}
 

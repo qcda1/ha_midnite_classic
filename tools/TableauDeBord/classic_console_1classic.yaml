@@ -1,0 +1,212 @@
+# Classic Console — entités dérivées, version UN SEUL CLASSIC.  Révision 4.
+#
+# Identique à classic_console.yaml (deux Classic), sans les trois agrégats
+# « Classic Puissance combinée / Récolte jour / Énergie cumulée » : avec un
+# seul contrôleur, ses propres capteurs suffisent.
+#
+# N'installez QU'UN des deux packages : ils déclarent les mêmes unique_id.
+#
+# Installation : config/packages/classic_console_1classic.yaml
+#   homeassistant:
+#     packages: !include_dir_named packages
+
+template:
+  - binary_sensor:
+      # Miroir anti-rebond du relais AUX 1.
+      #
+      # Le capteur d'origine passe brièvement à `unavailable` quand
+      # l'intégration se recharge, et `history_stats` compte chaque retour à
+      # `on` comme un nouveau démarrage — d'où les 3 démarrages affichés pour
+      # une seule mise en marche réelle.
+      #
+      # `delay_off` absorbe ces trous : une coupure plus courte que 120 s ne
+      # produit aucune transition. Ce miroir sert UNIQUEMENT au comptage ;
+      # le temps de marche reste mesuré sur le capteur brut pour ne pas
+      # gonfler la durée de 120 s à chaque cycle.
+      #
+      # PAS de clause `availability:` ici, volontairement : elle annulerait
+      # l'effet de `delay_off`, qui est précisément là pour ignorer les
+      # indisponibilités courtes.
+      - name: "Génératrice en marche"
+        unique_id: generatrice_en_marche
+        device_class: running
+        delay_off:
+          seconds: 120
+        state: >
+          {{ is_state('binary_sensor.classic1_aux_1_state_on', 'on') }}
+
+  - sensor:
+      # --- Banque de batteries -------------------------------------------
+      # Le WhizBang Jr voit le courant réel de la banque (charge moins
+      # consommation), contrairement au courant batterie de chaque Classic.
+      - name: "Banque Puissance nette"
+        unique_id: banque_puissance_nette
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-charging-outline
+        availability: >
+          {{ has_value('sensor.classic1_battery_voltage')
+             and has_value('sensor.classic1_whizbang_battery_current') }}
+        state: >
+          {{ (states('sensor.classic1_battery_voltage') | float(0)
+            * states('sensor.classic1_whizbang_battery_current') | float(0))
+            | round(0) }}
+
+      - name: "Banque Sens du courant"
+        unique_id: banque_sens_du_courant
+        icon: mdi:swap-vertical
+        availability: >
+          {{ has_value('sensor.classic1_whizbang_battery_current') }}
+        state: >
+          {% set i = states('sensor.classic1_whizbang_battery_current') | float(0) %}
+          {% if i > 0.5 %}Charge
+          {% elif i < -0.5 %}Décharge
+          {% else %}Équilibre
+          {% endif %}
+
+      - name: "Banque Énergie accumulée"
+        unique_id: banque_energie_accumulee
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:battery-arrow-up
+        availability: >
+          {{ has_value('sensor.classic1_wbjr_amp_hours_positive') }}
+        state: >
+          {{ (states('sensor.classic1_wbjr_amp_hours_positive') | float(0)
+            * states('sensor.classic1_nominal_battery_voltage') | float(48)
+            / 1000) | round(1) }}
+
+      - name: "Banque Énergie fournie"
+        unique_id: banque_energie_fournie
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:battery-arrow-down
+        availability: >
+          {{ has_value('sensor.classic1_wbjr_amp_hours_negative') }}
+        state: >
+          {{ (states('sensor.classic1_wbjr_amp_hours_negative') | float(0) | abs
+            * states('sensor.classic1_nominal_battery_voltage') | float(48)
+            / 1000) | round(1) }}
+
+      # --- Génératrice ----------------------------------------------------
+      - name: "Génératrice Marge avant démarrage"
+        unique_id: generatrice_marge_demarrage
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:gauge-low
+        availability: >
+          {{ has_value('sensor.classic1_state_of_charge')
+             and has_value('sensor.classic1_aux_1_low_threshold') }}
+        state: >
+          {{ (states('sensor.classic1_state_of_charge') | float(0)
+            - states('sensor.classic1_aux_1_low_threshold') | float(0))
+            | round(0) }}
+
+      # Ce capteur gère déjà l'indisponibilité par sa branche `Inconnu`.
+      # `availability:` est néanmoins préférable : « indisponible » se
+      # distingue d'un mode AUX 1 réellement non reconnu.
+      - name: "Génératrice Statut"
+        unique_id: generatrice_statut
+        icon: mdi:engine
+        availability: >
+          {{ has_value('binary_sensor.classic1_aux_1_state_on')
+             and has_value('select.classic1_aux_1_mode') }}
+        state: >
+          {% set relais = states('binary_sensor.classic1_aux_1_state_on') %}
+          {% set mode = states('select.classic1_aux_1_mode') %}
+          {% if mode == 'Aux 1 Off' %}Forcée à l'arrêt
+          {% elif mode == 'Aux 1 On' %}Forcée en marche
+          {% elif relais == 'on' %}En marche
+          {% elif relais == 'off' %}En attente
+          {% else %}Inconnu
+          {% endif %}
+
+sensor:
+  # Temps de marche : mesuré sur le capteur BRUT, pour rester exact.
+  # Une coupure d'intégration d'une fraction de seconde coûte une fraction de
+  # seconde de durée, ce qui est négligeable.
+  - platform: history_stats
+    name: Génératrice marche aujourd'hui
+    unique_id: generatrice_marche_jour
+    entity_id: binary_sensor.classic1_aux_1_state_on
+    state: "on"
+    type: time
+    start: "{{ today_at('00:00') }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: Génératrice marche 7 jours
+    unique_id: generatrice_marche_7j
+    entity_id: binary_sensor.classic1_aux_1_state_on
+    state: "on"
+    type: time
+    end: "{{ now() }}"
+    duration:
+      days: 7
+
+  # Démarrages : comptés sur le MIROIR anti-rebond.
+  # Le compteur repart de zéro à la création de l'entité — l'historique
+  # antérieur du miroir n'existe pas, donc le total du jour sera juste à
+  # partir du prochain cycle.
+  - platform: history_stats
+    name: Génératrice démarrages aujourd'hui
+    unique_id: generatrice_demarrages_jour
+    entity_id: binary_sensor.generatrice_en_marche
+    state: "on"
+    type: count
+    start: "{{ today_at('00:00') }}"
+    end: "{{ now() }}"
+
+automation:
+  # Les capteurs porteurs d'une unité sont exclus du journal. Ces deux
+  # automatisations réinjectent les changements de configuration AUX 1 dans le
+  # journal du relais, pour qu'ils se lisent à côté des cycles de génératrice.
+  - id: classic_journal_config_aux1
+    alias: "Classic — journal configuration AUX 1"
+    mode: queued
+    max: 10
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.classic1_aux_1_high_threshold
+          - sensor.classic1_aux_1_low_threshold
+          - sensor.classic1_aux_1_delay_time
+          - sensor.classic1_aux_1_hold_time
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.from_state.state not in ['unknown', 'unavailable']
+             and trigger.to_state.state not in ['unknown', 'unavailable']
+             and trigger.from_state.state != trigger.to_state.state }}
+    actions:
+      - action: logbook.log
+        data:
+          name: Config AUX 1
+          message: >
+            {{ trigger.to_state.name }} : {{ trigger.from_state.state }} →
+            {{ trigger.to_state.state }}
+            {{ trigger.to_state.attributes.unit_of_measurement }}
+          entity_id: binary_sensor.classic1_aux_1_state_on
+
+  - id: classic_journal_mode_aux1
+    alias: "Classic — journal mode AUX 1"
+    mode: queued
+    max: 5
+    triggers:
+      - trigger: state
+        entity_id: select.classic1_aux_1_mode
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.from_state.state not in ['unknown', 'unavailable']
+             and trigger.to_state.state not in ['unknown', 'unavailable']
+             and trigger.from_state.state != trigger.to_state.state }}
+    actions:
+      - action: logbook.log
+        data:
+          name: Mode AUX 1
+          message: "{{ trigger.from_state.state }} → {{ trigger.to_state.state }}"
+          entity_id: binary_sensor.classic1_aux_1_state_on
