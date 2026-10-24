@@ -126,10 +126,6 @@ Après le redémarrage, ces entités doivent exister
 - `sensor.generatrice_marche_aujourd_hui`, `sensor.generatrice_marche_7_jours`, `sensor.generatrice_demarrages_aujourd_hui`
 - `binary_sensor.generatrice_en_marche`
 
-> **Attention aux suffixes `_2`.** Si vous aviez déjà créé des capteurs du
-> même nom, Home Assistant ajoute `_2` au nouveau (ex.
-> `sensor.banque_sens_du_courant_2`) et le tableau de bord ne le trouvera
-> pas. Supprimez l'ancienne entité, puis renommez la nouvelle sans le `_2`.
 
 ### 4. Créer le tableau de bord
 
