@@ -8,7 +8,7 @@ Require pymodbus Python module (pip install pymodbus)
 
 ```
 python PrintRegisters.py --help
-usage: PrintRegistersRestant.py [-h] [-i IP] [-d DETAIL] [-x | -b | -a] [-r XXXX-YYYY] [-e EXCLUDE] [-l LOGLVL] [-s]
+usage: PrintRegisters.py [-h] [-i IP] [-d DETAIL] [-x | -b | -a] [-r XXXX-YYYY] [-e EXCLUDE] [-l LOGLVL] [-s]
 
 Fetch and print Midnite Solar Classic registers, excluding registers listed in an exclusion file. Useful for narrowing
 down which register holds an undocumented value.

@@ -91,7 +91,7 @@ def charger_exclusions(chemin, log):
     return exclusions
 
 
-parser = argparse.ArgumentParser(prog="PrintRegistersRestant.py",
+parser = argparse.ArgumentParser(prog="PrintRegisters.py",
         description="Fetch and print Midnite Solar Classic registers, excluding "
                      "registers listed in an exclusion file. Useful for narrowing "
                      "down which register holds an undocumented value.",
