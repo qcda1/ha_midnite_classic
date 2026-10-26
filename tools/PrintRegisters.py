@@ -120,10 +120,11 @@ parser.add_argument("-e", "--exclude", default="exclude.txt", type=str,
 parser.add_argument("-l", "--loglvl", default="INFO", type=str,
                     help="Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: %(default)s)")
 parser.add_argument("-s", "--silence", action='store_true',
-        help="Mode silencieux: seules les lignes de registres sont imprimées sur "
-             "stdout (aucun bandeau, aucun message de log). Les logs vont sur "
-             "stderr. Utile avec crontab + redirection vers un fichier "
+        help="Silence mode: only the registers lines are printed on "
+             "stdout (no banner, no log messages). The logs are printed on "
+             "stderr. Useful with crontab + redirection to a file "
              "(default: %(default)s)")
+
 args = parser.parse_args()
 
 # Configuration du logging

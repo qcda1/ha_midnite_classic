@@ -2,12 +2,15 @@
 
 ## 1- PrintRegisters.py
 
-Utility program to read Midnite Solar Classic controller's registers and print them in different format. 
+Utility program to read Midnite Solar Classic controller's registers and print them in different format.
+There is a level of detail printed about each registers. These details are the same as the ones
+present in the 'classic_register_map_Rev-C5-December-8-2013.pdf' document.
 
 Require pymodbus Python module (pip install pymodbus)
 
 ```
 python PrintRegisters.py --help
+
 usage: PrintRegisters.py [-h] [-i IP] [-d DETAIL] [-x | -b | -a] [-r XXXX-YYYY] [-e EXCLUDE] [-l LOGLVL] [-s]
 
 Fetch and print Midnite Solar Classic registers, excluding registers listed in an exclusion file. Useful for narrowing
@@ -27,9 +30,8 @@ options:
                         Text file listing registers to exclude (one per line, or ranges 'NNNN-MMMM'). Ignored silently
                         if the file doesn't exist. (default: exclude.txt)
   -l, --loglvl LOGLVL   Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)
-  -s, --silence         Mode silencieux: seules les lignes de registres sont imprimées sur stdout (aucun bandeau, aucun
-                        message de log). Les logs vont sur stderr. Utile avec crontab + redirection vers un fichier
-                        (default: False)
+  -s, --silence         Silence mode: only the registers lines are printed on stdout (no banner, no log messages).
+                        The logs are printed on stderr. Useful with crontab + redirection to a file (default: False)
 
 Output uses '-' as separator for easy csv import in Excel.
 ```
