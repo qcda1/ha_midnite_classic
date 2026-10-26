@@ -84,4 +84,5 @@ Classic setup and CLASSIC1 & CLASSIC2 on a two Classic installation. At the time
 Home Assistant, the equipment will be named after the host name and will fit the dashboard.
 
 
-Refer to the dashboard's README.md file for installation instructions.
+Refer to the dashboard's [README](TableauDeBord/README.md) file for installation instructions.
+
