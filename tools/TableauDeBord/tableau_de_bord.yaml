@@ -36,7 +36,7 @@ views:
                 ha-markdown:
                   $: |
                     h2 {
-                      font-size: 15px !important;
+                      font-size: 26px !important;
                       letter-spacing: 0.34em !important;
                       text-transform: uppercase;
                       color: var(--classic-phosphor, #7FE3C4) !important;
@@ -45,7 +45,8 @@ views:
                     }
                     p {
                       font-family: var(--classic-mono);
-                      font-size: 12px !important;
+                      font-size: 18px !important;
+                      font-weight: 800 !important;
                       letter-spacing: 0.14em;
                       color: var(--secondary-text-color) !important;
                       margin: 0 !important;
@@ -151,7 +152,7 @@ views:
                               display: block;
                               font-size: 10px !important;
                               letter-spacing: 0.22em;
-                              color: var(--classic-pixel, #4B4FC4) !important;
+                              color: var(--classic-pixel, #7FE3C4) !important;
                               margin-bottom: 12px !important;
                             }
                             p:last-of-type { margin-bottom: 0 !important; }
@@ -345,7 +346,7 @@ views:
                               display: block;
                               font-size: 10px !important;
                               letter-spacing: 0.22em;
-                              color: var(--classic-pixel, #4B4FC4) !important;
+                              color: var(--classic-pixel, #7FE3C4) !important;
                               margin-bottom: 12px !important;
                             }
                             p:last-of-type { margin-bottom: 0 !important; }
@@ -539,7 +540,7 @@ views:
                           display: block;
                           font-size: 10px !important;
                           letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #4B4FC4) !important;
+                          color: var(--classic-pixel, #7FE3C4) !important;
                           margin-bottom: 12px !important;
                         }
                         p:last-of-type { margin-bottom: 0 !important; }
@@ -772,7 +773,7 @@ views:
                           display: block;
                           font-size: 10px !important;
                           letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #4B4FC4) !important;
+                          color: var(--classic-pixel, #7FE3C4) !important;
                           margin-bottom: 12px !important;
                         }
                         p:last-of-type { margin-bottom: 0 !important; }
@@ -1010,7 +1011,7 @@ views:
                           display: block;
                           font-size: 10px !important;
                           letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #4B4FC4) !important;
+                          color: var(--classic-pixel, #7FE3C4) !important;
                           margin-bottom: 12px !important;
                         }
                         p:last-of-type { margin-bottom: 0 !important; }
@@ -1073,7 +1074,7 @@ views:
                           display: block;
                           font-size: 10px !important;
                           letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #4B4FC4) !important;
+                          color: var(--classic-pixel, #7FE3C4) !important;
                           margin-bottom: 12px !important;
                         }
                         p:last-of-type { margin-bottom: 0 !important; }
@@ -1166,7 +1167,7 @@ views:
                       font-size: 11px !important;
                       letter-spacing: 0.30em !important;
                       font-weight: 400 !important;
-                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
+                      color: var(--classic-phosphor-dim, #7FE3C4) !important;
                       margin: 0 !important;
                       text-transform: uppercase;
                     }
