@@ -609,6 +609,15 @@ views:
 
                   DÉMARRAGES `{{
                   states('sensor.generatrice_demarrages_aujourd_hui') }}`
+
+
+                  ÉNERGIE JOUR `{{
+                  states('sensor.generatrice_energie_aujourd_hui') | float(0) |
+                  round(1) }} kWh`
+
+
+                  ÉNERGIE 7 J `{{ states('sensor.generatrice_energie_7_jours')
+                  | float(0) | round(1) }} kWh`
                 card_mod:
                   style:
                     ha-markdown:

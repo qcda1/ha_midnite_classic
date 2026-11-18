@@ -1,1257 +1,376 @@
-title: Classic
-views:
-  - title: Console
-    path: console
-    icon: mdi:solar-power-variant
-    type: panel
-    cards:
-      - type: vertical-stack
-        cards:
-          - type: markdown
-            content: >
-              ## RÉSEAU MIDNITE CLASSIC
-
-
-              {% set p = states('sensor.classic_puissance_combinee') | float(0)
-              %}
-
-              {% set soc = states('sensor.classic1_state_of_charge') | float(0) %}
-
-              {% set gen = states('binary_sensor.classic1_aux_1_state_on') %}
-
-              {%- if gen == 'on' -%}GÉNÉRATRICE EN MARCHE
-
-              {%- elif p > 50 -%}RÉCOLTE EN COURS
-
-              {%- else -%}REPOS{%- endif -%}
-
-              &nbsp;·&nbsp; BATT {{ soc | round(0) }} %
-
-              &nbsp;·&nbsp; {{ p | round(0) }} W
-
-              &nbsp;·&nbsp; {{ states('sensor.classic1_charge_state_text') |
-              upper }}
-            card_mod:
-              style:
-                ha-markdown:
-                  $: |
-                    h2 {
-                      font-size: 26px !important;
-                      letter-spacing: 0.34em !important;
-                      text-transform: uppercase;
-                      color: var(--classic-phosphor, #7FE3C4) !important;
-                      font-weight: 400 !important;
-                      margin: 0 0 6px 0 !important;
-                    }
-                    p {
-                      font-family: var(--classic-mono);
-                      font-size: 18px !important;
-                      font-weight: 800 !important;
-                      letter-spacing: 0.14em;
-                      color: var(--secondary-text-color) !important;
-                      margin: 0 !important;
-                    }
-                .: |
-                  ha-card {
-                    background: linear-gradient(180deg,
-                      rgba(127,227,196,0.07) 0%, rgba(13,22,32,0) 70%),
-                      var(--classic-panel, #0D1620);
-                    border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    border-left: 2px solid var(--classic-phosphor, #7FE3C4);
-                    padding: 14px 18px;
-                  }
-          - type: horizontal-stack
-            cards:
-              - type: vertical-stack
-                cards:
-                  - type: markdown
-                    content: |
-                      ## {{ states('sensor.classic1_device_name') }}
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            h2 {
-                              font-size: 12px !important;
-                              letter-spacing: 0.26em !important;
-                              font-weight: 400 !important;
-                              text-transform: uppercase;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              margin: 0 !important;
-                            }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            border-bottom: none;
-                            padding: 10px 16px 8px 16px;
-                          }
-                  - type: gauge
-                    entity: sensor.classic1_power
-                    name: PUISSANCE
-                    unit: W
-                    min: 0
-                    max: 1400
-                    needle: true
-                    severity:
-                      green: 0
-                      yellow: 900
-                      red: 1200
-                    card_mod:
-                      style: |
-                        ha-card {
-                          position: relative;
-                          background: linear-gradient(180deg,
-                            rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                            var(--classic-panel, #0D1620);
-                          border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        }
-                        ha-card::before, ha-card::after {
-                          content: ""; position: absolute;
-                          width: 9px; height: 9px;
-                          border-color: var(--classic-phosphor, #7FE3C4);
-                          opacity: 0.45; pointer-events: none;
-                        }
-                        ha-card::before {
-                          top: 0; left: 0;
-                          border-top: 1px solid; border-left: 1px solid;
-                        }
-                        ha-card::after {
-                          bottom: 0; right: 0;
-                          border-bottom: 1px solid; border-right: 1px solid;
-                        }
-                  - type: markdown
-                    content: |
-                      **REG 4116 · 4118 · 4127**
-
-                      JOUR `{{ states('sensor.classic1_energy_today') }} kWh`
-
-                      CUMUL `{{ states('sensor.classic1_total_energy') }} kWh`
-
-                      ÉTAGE `{{ states('sensor.classic1_charge_state_text') }}`
-
-                      MPPT `{{ states('sensor.classic1_mppt_mode_text') }}`
-
-                      FET `{{ states('sensor.classic1_fet_temperature') }} °C`
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            p {
-                              display: flex;
-                              align-items: baseline;
-                              justify-content: space-between;
-                              gap: 12px;
-                              white-space: nowrap;
-                              font-size: 11.5px !important;
-                              letter-spacing: 0.08em;
-                              color: var(--secondary-text-color) !important;
-                              margin: 0 0 6px 0 !important;
-                            }
-                            p:first-of-type {
-                              display: block;
-                              font-size: 10px !important;
-                              letter-spacing: 0.22em;
-                              color: var(--classic-pixel, #7FE3C4) !important;
-                              margin-bottom: 12px !important;
-                            }
-                            p:last-of-type { margin-bottom: 0 !important; }
-                            strong { font-weight: 400 !important; }
-                            code {
-                              font-family: var(--classic-mono);
-                              background: rgba(127,227,196,0.07) !important;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              padding: 1px 6px !important;
-                              border-radius: 2px;
-                              /* La valeur peut rétrécir et se couper plutôt
-                                 que de déborder : « Reason For Resting » peut
-                                 faire 149 caractères. */
-                              flex: 0 1 auto;
-                              min-width: 0;
-                              overflow: hidden;
-                              text-overflow: ellipsis;
-                            }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            padding: 12px 16px;
-                          }
-              - type: vertical-stack
-                cards:
-                  - type: markdown
-                    content: |
-                      ## COMBINÉ
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            h2 {
-                              font-size: 12px !important;
-                              letter-spacing: 0.26em !important;
-                              font-weight: 400 !important;
-                              text-transform: uppercase;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              margin: 0 !important;
-                            }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            border-bottom: none;
-                            padding: 10px 16px 8px 16px;
-                          }
-                  - type: markdown
-                    content: >
-                      {% set p = states('sensor.classic_puissance_combinee') |
-                      float(0) %}
-
-                      {% set r = states('sensor.classic_recolte_jour') |
-                      float(0) %}
-
-                      {% set pmax = 2600 %}
-
-                      {% set rmax = 30 %}
-
-                      # {{ p | round(0) }} W
-
-
-                      {{ (100 * p / pmax) | round(0) }} % DE {{ pmax }} W
-
-
-                      RÉCOLTE JOUR {{ r }} kWh · {{ (100 * r / rmax) | round(0) }} %
-                      DE {{ rmax }} kWh
-
-
-                      CUMUL {{ states('sensor.classic_energie_cumulee') }} kWh
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            h1 {
-                              font-family: var(--classic-mono);
-                              font-size: 46px !important;
-                              line-height: 1 !important;
-                              font-weight: 300 !important;
-                              letter-spacing: -0.01em;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              text-align: center;
-                              margin: 0 0 10px 0 !important;
-                              text-shadow: 0 0 22px rgba(127,227,196,0.35);
-                            }
-                            p {
-                              font-family: var(--classic-mono);
-                              font-size: 14px !important;
-                              line-height: 1.5 !important;
-                              letter-spacing: 0.10em;
-                              text-align: center;
-                              color: #CFEDE4 !important;
-                              margin: 0 0 8px 0 !important;
-                            }
-                            p:last-of-type { margin-bottom: 0 !important; }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            border-top: 2px solid var(--classic-phosphor, #7FE3C4);
-                            padding: 40px 16px;
-                          }
-              - type: vertical-stack
-                cards:
-                  - type: markdown
-                    content: |
-                      ## {{ states('sensor.classic2_device_name') }}
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            h2 {
-                              font-size: 12px !important;
-                              letter-spacing: 0.26em !important;
-                              font-weight: 400 !important;
-                              text-transform: uppercase;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              margin: 0 !important;
-                            }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            border-bottom: none;
-                            padding: 10px 16px 8px 16px;
-                          }
-                  - type: gauge
-                    entity: sensor.classic2_power
-                    name: PUISSANCE
-                    unit: W
-                    min: 0
-                    max: 1600
-                    needle: true
-                    severity:
-                      green: 0
-                      yellow: 1200
-                      red: 1400
-                    card_mod:
-                      style: |
-                        ha-card {
-                          position: relative;
-                          background: linear-gradient(180deg,
-                            rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                            var(--classic-panel, #0D1620);
-                          border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        }
-                        ha-card::before, ha-card::after {
-                          content: ""; position: absolute;
-                          width: 9px; height: 9px;
-                          border-color: var(--classic-phosphor, #7FE3C4);
-                          opacity: 0.45; pointer-events: none;
-                        }
-                        ha-card::before {
-                          top: 0; left: 0;
-                          border-top: 1px solid; border-left: 1px solid;
-                        }
-                        ha-card::after {
-                          bottom: 0; right: 0;
-                          border-bottom: 1px solid; border-right: 1px solid;
-                        }
-                  - type: markdown
-                    content: |
-                      **REG 4116 · 4118 · 4127**
-
-                      JOUR `{{ states('sensor.classic2_energy_today') }} kWh`
-
-                      CUMUL `{{ states('sensor.classic2_total_energy') }} kWh`
-
-                      ÉTAGE `{{ states('sensor.classic2_charge_state_text') }}`
-
-                      MPPT `{{ states('sensor.classic2_mppt_mode_text') }}`
-
-                      FET `{{ states('sensor.classic2_fet_temperature') }} °C`
-                    card_mod:
-                      style:
-                        ha-markdown:
-                          $: |
-                            p {
-                              display: flex;
-                              align-items: baseline;
-                              justify-content: space-between;
-                              gap: 12px;
-                              white-space: nowrap;
-                              font-size: 11.5px !important;
-                              letter-spacing: 0.08em;
-                              color: var(--secondary-text-color) !important;
-                              margin: 0 0 6px 0 !important;
-                            }
-                            p:first-of-type {
-                              display: block;
-                              font-size: 10px !important;
-                              letter-spacing: 0.22em;
-                              color: var(--classic-pixel, #7FE3C4) !important;
-                              margin-bottom: 12px !important;
-                            }
-                            p:last-of-type { margin-bottom: 0 !important; }
-                            strong { font-weight: 400 !important; }
-                            code {
-                              font-family: var(--classic-mono);
-                              background: rgba(127,227,196,0.07) !important;
-                              color: var(--classic-phosphor, #7FE3C4) !important;
-                              padding: 1px 6px !important;
-                              border-radius: 2px;
-                              /* La valeur peut rétrécir et se couper plutôt
-                                 que de déborder : « Reason For Resting » peut
-                                 faire 149 caractères. */
-                              flex: 0 1 auto;
-                              min-width: 0;
-                              overflow: hidden;
-                              text-overflow: ellipsis;
-                            }
-                        .: |
-                          ha-card {
-                            background: var(--classic-panel, #0D1620);
-                            border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                            padding: 12px 16px;
-                          }
-          - type: markdown
-            content: '## BANQUE DE BATTERIES · REG 4360-4383'
-            card_mod:
-              style:
-                ha-markdown:
-                  $: |
-                    h2 {
-                      font-size: 11px !important;
-                      letter-spacing: 0.30em !important;
-                      font-weight: 400 !important;
-                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
-                      margin: 0 !important;
-                      text-transform: uppercase;
-                    }
-                .: |
-                  ha-card {
-                    background: transparent;
-                    border: none;
-                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    box-shadow: none;
-                    padding: 18px 4px 6px 4px;
-                  }
-          - type: horizontal-stack
-            cards:
-              - type: gauge
-                entity: sensor.classic1_state_of_charge
-                name: ÉTAT DE CHARGE
-                unit: '%'
-                min: 0
-                max: 100
-                needle: true
-                severity:
-                  red: 0
-                  yellow: 50
-                  green: 80
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
-              - type: gauge
-                entity: sensor.classic1_battery_voltage
-                name: TENSION BATT
-                unit: V
-                min: 44
-                max: 62
-                needle: true
-                severity:
-                  red: 44
-                  yellow: 47
-                  green: 50
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
-              - type: gauge
-                entity: sensor.classic1_whizbang_battery_current
-                name: COURANT BATT
-                unit: A
-                min: -150
-                max: 150
-                needle: true
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
-              - type: markdown
-                content: >
-                  **BILAN WHIZBANG JR**
-
-
-                  SENS `{{ states('sensor.banque_sens_du_courant') }}`
-
-
-                  PUISSANCE `{{ states('sensor.banque_puissance_nette') }} W`
-
-
-                  Ah RESTE `{{ states('sensor.classic1_remaining_amp_hours') }}
-                  Ah`
-
-
-                  Ah TOTAL `{{ states('sensor.classic1_total_amp_hours') }} Ah`
-
-
-                  Ah NET `{{ states('sensor.classic1_wbjr_amp_hours_net') }} Ah`
-
-
-                  ENTRÉE `{{ states('sensor.banque_energie_accumulee') }} kWh`
-
-
-                  SORTIE `{{ states('sensor.banque_energie_fournie') }} kWh`
-
-
-                  TEMP. `{{ states('sensor.classic1_battery_temperature') }} °C`
-                card_mod:
-                  style:
-                    ha-markdown:
-                      $: |
-                        p {
-                          display: flex;
-                          align-items: baseline;
-                          justify-content: space-between;
-                          gap: 12px;
-                          white-space: nowrap;
-                          font-size: 11.5px !important;
-                          letter-spacing: 0.08em;
-                          color: var(--secondary-text-color) !important;
-                          margin: 0 0 6px 0 !important;
-                        }
-                        p:first-of-type {
-                          display: block;
-                          font-size: 10px !important;
-                          letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #7FE3C4) !important;
-                          margin-bottom: 12px !important;
-                        }
-                        p:last-of-type { margin-bottom: 0 !important; }
-                        strong { font-weight: 400 !important; }
-                        code {
-                          font-family: var(--classic-mono);
-                          background: rgba(127,227,196,0.07) !important;
-                          color: var(--classic-phosphor, #7FE3C4) !important;
-                          padding: 1px 6px !important;
-                          border-radius: 2px;
-                          /* La valeur peut rétrécir et se couper plutôt
-                             que de déborder : « Reason For Resting » peut
-                             faire 149 caractères. */
-                          flex: 0 1 auto;
-                          min-width: 0;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                        }
-                    .: |
-                      ha-card {
-                        background: var(--classic-panel, #0D1620);
-                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        padding: 12px 16px;
-                      }
-          - type: custom:apexcharts-card
-            header:
-              show: true
-              title: ÉTAT DE CHARGE ET COURANT BATT
-              show_states: false
-            graph_span: 24h
-            span:
-              end: minute
-            apex_config:
-              chart:
-                height: 220
-                background: transparent
-              grid:
-                borderColor: rgba(75,79,196,0.20)
-                strokeDashArray: 3
-              legend:
-                show: true
-                position: top
-                horizontalAlign: right
-              yaxis:
-                - id: soc
-                  min: 0
-                  max: 100
-                  decimalsInFloat: 0
-                  title:
-                    text: '%'
-                - id: courant
-                  opposite: true
-                  decimalsInFloat: 0
-                  title:
-                    text: A
-            series:
-              - entity: sensor.classic1_state_of_charge
-                name: État de charge
-                yaxis_id: soc
-                type: line
-                curve: smooth
-                stroke_width: 2
-                color: '#7FE3C4'
-              - entity: sensor.classic1_whizbang_battery_current
-                name: Courant batt
-                yaxis_id: courant
-                type: area
-                curve: smooth
-                opacity: 0.18
-                stroke_width: 1
-                color: '#8B8FF0'
-            card_mod:
-              style: |
-                ha-card {
-                  position: relative;
-                  background: linear-gradient(180deg,
-                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                    var(--classic-panel, #0D1620);
-                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                }
-                ha-card::before, ha-card::after {
-                  content: ""; position: absolute;
-                  width: 9px; height: 9px;
-                  border-color: var(--classic-phosphor, #7FE3C4);
-                  opacity: 0.45; pointer-events: none;
-                }
-                ha-card::before {
-                  top: 0; left: 0;
-                  border-top: 1px solid; border-left: 1px solid;
-                }
-                ha-card::after {
-                  bottom: 0; right: 0;
-                  border-bottom: 1px solid; border-right: 1px solid;
-                }
-          - type: markdown
-            content: '## GÉNÉRATRICE · AUX 1 · REG 4165 · 4166 · 4167 · 4168 · 4172'
-            card_mod:
-              style:
-                ha-markdown:
-                  $: |
-                    h2 {
-                      font-size: 11px !important;
-                      letter-spacing: 0.30em !important;
-                      font-weight: 400 !important;
-                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
-                      margin: 0 !important;
-                      text-transform: uppercase;
-                    }
-                .: |
-                  ha-card {
-                    background: transparent;
-                    border: none;
-                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    box-shadow: none;
-                    padding: 18px 4px 6px 4px;
-                  }
-          - type: horizontal-stack
-            cards:
-              - type: markdown
-                content: >
-                  # {{ states('sensor.generatrice_statut') | upper }}
-
-
-                  {% set m = states('sensor.generatrice_marge_avant_demarrage')
-                  | float(0) %}
-
-                  {%- if states('binary_sensor.classic1_aux_1_state_on') == 'on'
-                  -%}
-
-                  Le relais est fermé. Arrêt lorsque l'état de charge dépasse
-
-                  {{ states('sensor.classic1_aux_1_high_threshold') }} %,
-
-                  puis {{ states('sensor.classic1_aux_1_delay_time') }} s de
-                  délai.
-
-                  {%- else -%}
-
-                  Marge avant démarrage : {{ m | round(0) }} points d'état de
-                  charge.
-
-                  Sous le seuil, le Classic attend
-
-                  {{ states('sensor.classic1_aux_1_hold_time') }} s
-
-                  avant de fermer le relais.
-
-                  {%- endif -%}
-                card_mod:
-                  style:
-                    ha-markdown:
-                      $: |
-                        h1 {
-                          font-family: var(--classic-mono);
-                          font-size: 26px !important;
-                          font-weight: 300 !important;
-                          letter-spacing: 0.06em;
-                          color: var(--classic-amber, #FFB03A) !important;
-                          margin: 0 0 10px 0 !important;
-                          text-shadow: 0 0 18px rgba(255,176,58,0.30);
-                        }
-                        p {
-                          font-size: 12px !important;
-                          line-height: 1.6 !important;
-                          color: var(--secondary-text-color) !important;
-                          margin: 0 !important;
-                        }
-                    .: |
-                      ha-card {
-                        background: linear-gradient(180deg,
-                          rgba(255,176,58,0.06) 0%, rgba(13,22,32,0) 60%),
-                          var(--classic-panel, #0D1620);
-                        border: 1px solid rgba(255,176,58,0.22);
-                        border-left: 2px solid var(--classic-amber, #FFB03A);
-                        padding: 16px 18px;
-                      }
-              - type: markdown
-                content: >
-                  **GÉNÉRATRICE**
-
-                  **CONSIGNES ET COMPTEURS**
-
-
-                  SEUIL BAS `{{ states('sensor.classic1_aux_1_low_threshold') }}
-                  %`
-
-
-                  SEUIL HAUT `{{ states('sensor.classic1_aux_1_high_threshold')
-                  }} %`
-
-
-                  DÉLAI ARRÊT `{{ states('sensor.classic1_aux_1_delay_time') }}
-                  s`
-
-
-                  DÉLAI DÉMARR. `{{ states('sensor.classic1_aux_1_hold_time') }}
-                  s`
-
-
-                  FONCTION `{{ states('sensor.classic1_aux_1_function_text') }}`
-
-
-                  MARCHE JOUR `{{
-                  states('sensor.generatrice_marche_aujourd_hui') | float(0) |
-                  round(1) }} h`
-
-
-                  MARCHE 7 J `{{ states('sensor.generatrice_marche_7_jours') |
-                  float(0) | round(1) }} h`
-
-
-                  DÉMARRAGES `{{
-                  states('sensor.generatrice_demarrages_aujourd_hui') }}`
-                card_mod:
-                  style:
-                    ha-markdown:
-                      $: |
-                        p {
-                          display: flex;
-                          align-items: baseline;
-                          justify-content: space-between;
-                          gap: 12px;
-                          white-space: nowrap;
-                          font-size: 11.5px !important;
-                          letter-spacing: 0.08em;
-                          color: var(--secondary-text-color) !important;
-                          margin: 0 0 6px 0 !important;
-                        }
-                        p:first-of-type {
-                          display: block;
-                          font-size: 10px !important;
-                          letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #7FE3C4) !important;
-                          margin-bottom: 12px !important;
-                        }
-                        p:last-of-type { margin-bottom: 0 !important; }
-                        strong { font-weight: 400 !important; }
-                        code {
-                          font-family: var(--classic-mono);
-                          background: rgba(127,227,196,0.07) !important;
-                          color: var(--classic-phosphor, #7FE3C4) !important;
-                          padding: 1px 6px !important;
-                          border-radius: 2px;
-                          /* La valeur peut rétrécir et se couper plutôt
-                             que de déborder : « Reason For Resting » peut
-                             faire 149 caractères. */
-                          flex: 0 1 auto;
-                          min-width: 0;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                        }
-                    .: |
-                      ha-card {
-                        background: var(--classic-panel, #0D1620);
-                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        padding: 12px 16px;
-                      }
-              - type: entities
-                title: COMMANDE AUX 1
-                show_header_toggle: false
-                entities:
-                  - entity: select.classic1_aux_1_mode
-                    name: Mode
-                  - entity: number.classic1_aux_1_low_threshold_set
-                    name: Seuil bas
-                  - entity: number.classic1_aux_1_high_threshold_set
-                    name: Seuil haut
-                  - entity: number.classic1_aux_1_delay_time_set
-                    name: Délai arrêt
-                  - entity: number.classic1_aux_1_hold_time_set
-                    name: Délai démarrage
-                  - type: divider
-                  - entity: button.classic1_save_settings_to_eeprom
-                    name: Écrire en EEPROM
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
-          - type: custom:apexcharts-card
-            header:
-              show: true
-              title: ÉTAT DE CHARGE CONTRE SEUILS AUX 1
-              show_states: false
-            graph_span: 48h
-            span:
-              end: minute
-            apex_config:
-              chart:
-                height: 260
-                background: transparent
-              grid:
-                borderColor: rgba(75,79,196,0.20)
-                strokeDashArray: 3
-              legend:
-                show: true
-                position: top
-                horizontalAlign: right
-              stroke:
-                dashArray:
-                  - 0
-                  - 0
-                  - 6
-                  - 6
-              yaxis:
-                - min: 0
-                  max: 100
-                  decimalsInFloat: 0
-                  title:
-                    text: '%'
-            series:
-              - entity: sensor.classic1_state_of_charge
-                name: État de charge
-                type: line
-                curve: smooth
-                stroke_width: 2
-                color: '#7FE3C4'
-              - entity: binary_sensor.classic1_aux_1_state_on
-                name: Génératrice
-                type: area
-                curve: stepline
-                opacity: 0.22
-                stroke_width: 1
-                color: '#FFB03A'
-                transform: 'return x === ''on'' ? 100 : 0;'
-              - entity: sensor.classic1_aux_1_high_threshold
-                name: Seuil haut
-                type: line
-                curve: stepline
-                stroke_width: 2
-                color: '#FFB03A'
-                extend_to: now
-              - entity: sensor.classic1_aux_1_low_threshold
-                name: Seuil bas
-                type: line
-                curve: stepline
-                stroke_width: 2
-                color: '#FF5A52'
-                extend_to: now
-            card_mod:
-              style: |
-                ha-card {
-                  position: relative;
-                  background: linear-gradient(180deg,
-                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                    var(--classic-panel, #0D1620);
-                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                }
-                ha-card::before, ha-card::after {
-                  content: ""; position: absolute;
-                  width: 9px; height: 9px;
-                  border-color: var(--classic-phosphor, #7FE3C4);
-                  opacity: 0.45; pointer-events: none;
-                }
-                ha-card::before {
-                  top: 0; left: 0;
-                  border-top: 1px solid; border-left: 1px solid;
-                }
-                ha-card::after {
-                  bottom: 0; right: 0;
-                  border-bottom: 1px solid; border-right: 1px solid;
-                }
-          - type: logbook
-            target:
-              entity_id:
-                - binary_sensor.classic1_aux_1_state_on
-            hours_to_show: 72
-            card_mod:
-              style: |
-                ha-card {
-                  position: relative;
-                  background: linear-gradient(180deg,
-                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                    var(--classic-panel, #0D1620);
-                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                }
-                ha-card::before, ha-card::after {
-                  content: ""; position: absolute;
-                  width: 9px; height: 9px;
-                  border-color: var(--classic-phosphor, #7FE3C4);
-                  opacity: 0.45; pointer-events: none;
-                }
-                ha-card::before {
-                  top: 0; left: 0;
-                  border-top: 1px solid; border-left: 1px solid;
-                }
-                ha-card::after {
-                  bottom: 0; right: 0;
-                  border-bottom: 1px solid; border-right: 1px solid;
-                }
-          - type: markdown
-            content: '## CHAÎNES PHOTOVOLTAÏQUES · REG 4115 · 4121 · 4136'
-            card_mod:
-              style:
-                ha-markdown:
-                  $: |
-                    h2 {
-                      font-size: 11px !important;
-                      letter-spacing: 0.30em !important;
-                      font-weight: 400 !important;
-                      color: var(--classic-phosphor-dim, #2E6A5E) !important;
-                      margin: 0 !important;
-                      text-transform: uppercase;
-                    }
-                .: |
-                  ha-card {
-                    background: transparent;
-                    border: none;
-                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    box-shadow: none;
-                    padding: 18px 4px 6px 4px;
-                  }
-          - type: horizontal-stack
-            cards:
-              - type: markdown
-                content: >
-                  **{{ states('sensor.classic1_device_name') }}**
-
-
-                  TENSION PV `{{ states('sensor.classic1_pv_voltage') }} V`
-
-
-                  COURANT PV `{{ states('sensor.classic1_pv_current') }} A`
-
-
-                  DERNIER VOC `{{ states('sensor.classic1_last_voc') }} V`
-
-
-                  COURANT BATT `{{ states('sensor.classic1_battery_current') }}
-                  A`
-
-
-                  STATUT `{% if is_state('sensor.classic1_charge_state_text', 'Resting') %}{{ states('sensor.classic1_reason_for_resting_text') }}{% else %}En opération{% endif %}`
-                card_mod:
-                  style:
-                    ha-markdown:
-                      $: |
-                        p {
-                          display: flex;
-                          align-items: baseline;
-                          justify-content: space-between;
-                          gap: 12px;
-                          white-space: nowrap;
-                          font-size: 11.5px !important;
-                          letter-spacing: 0.08em;
-                          color: var(--secondary-text-color) !important;
-                          margin: 0 0 6px 0 !important;
-                        }
-                        p:first-of-type {
-                          display: block;
-                          font-size: 10px !important;
-                          letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #7FE3C4) !important;
-                          margin-bottom: 12px !important;
-                        }
-                        p:last-of-type { margin-bottom: 0 !important; }
-                        strong { font-weight: 400 !important; }
-                        code {
-                          font-family: var(--classic-mono);
-                          background: rgba(127,227,196,0.07) !important;
-                          color: var(--classic-phosphor, #7FE3C4) !important;
-                          padding: 1px 6px !important;
-                          border-radius: 2px;
-                          /* La valeur peut rétrécir et se couper plutôt
-                             que de déborder : « Reason For Resting » peut
-                             faire 149 caractères. */
-                          flex: 0 1 auto;
-                          min-width: 0;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                        }
-                    .: |
-                      ha-card {
-                        background: var(--classic-panel, #0D1620);
-                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        padding: 12px 16px;
-                      }
-              - type: markdown
-                content: >
-                  **{{ states('sensor.classic2_device_name') }}**
-
-
-                  TENSION PV `{{ states('sensor.classic2_pv_voltage') }} V`
-
-
-                  COURANT PV `{{ states('sensor.classic2_pv_current') }} A`
-
-
-                  DERNIER VOC `{{ states('sensor.classic2_last_voc') }} V`
-
-
-                  COURANT BATT `{{ states('sensor.classic2_battery_current') }}
-                  A`
-
-
-                  STATUT `{% if is_state('sensor.classic2_charge_state_text', 'Resting') %}{{ states('sensor.classic2_reason_for_resting_text') }}{% else %}En opération{% endif %}`
-                card_mod:
-                  style:
-                    ha-markdown:
-                      $: |
-                        p {
-                          display: flex;
-                          align-items: baseline;
-                          justify-content: space-between;
-                          gap: 12px;
-                          white-space: nowrap;
-                          font-size: 11.5px !important;
-                          letter-spacing: 0.08em;
-                          color: var(--secondary-text-color) !important;
-                          margin: 0 0 6px 0 !important;
-                        }
-                        p:first-of-type {
-                          display: block;
-                          font-size: 10px !important;
-                          letter-spacing: 0.22em;
-                          color: var(--classic-pixel, #7FE3C4) !important;
-                          margin-bottom: 12px !important;
-                        }
-                        p:last-of-type { margin-bottom: 0 !important; }
-                        strong { font-weight: 400 !important; }
-                        code {
-                          font-family: var(--classic-mono);
-                          background: rgba(127,227,196,0.07) !important;
-                          color: var(--classic-phosphor, #7FE3C4) !important;
-                          padding: 1px 6px !important;
-                          border-radius: 2px;
-                          /* La valeur peut rétrécir et se couper plutôt
-                             que de déborder : « Reason For Resting » peut
-                             faire 149 caractères. */
-                          flex: 0 1 auto;
-                          min-width: 0;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                        }
-                    .: |
-                      ha-card {
-                        background: var(--classic-panel, #0D1620);
-                        border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                        padding: 12px 16px;
-                      }
-          - type: custom:apexcharts-card
-            header:
-              show: true
-              title: PUISSANCE PAR CONTRÔLEUR
-              show_states: false
-            graph_span: 24h
-            span:
-              end: minute
-            apex_config:
-              chart:
-                height: 220
-                stacked: true
-                background: transparent
-              grid:
-                borderColor: rgba(75,79,196,0.20)
-                strokeDashArray: 3
-              legend:
-                show: true
-                position: top
-                horizontalAlign: right
-            series:
-              - entity: sensor.classic1_power
-                name: Classic 1
-                type: area
-                curve: smooth
-                opacity: 0.35
-                stroke_width: 1
-                color: '#7FE3C4'
-              - entity: sensor.classic2_power
-                name: Classic 2
-                type: area
-                curve: smooth
-                opacity: 0.35
-                stroke_width: 1
-                color: '#8B8FF0'
-            card_mod:
-              style: |
-                ha-card {
-                  position: relative;
-                  background: linear-gradient(180deg,
-                    rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                    var(--classic-panel, #0D1620);
-                  border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                }
-                ha-card::before, ha-card::after {
-                  content: ""; position: absolute;
-                  width: 9px; height: 9px;
-                  border-color: var(--classic-phosphor, #7FE3C4);
-                  opacity: 0.45; pointer-events: none;
-                }
-                ha-card::before {
-                  top: 0; left: 0;
-                  border-top: 1px solid; border-left: 1px solid;
-                }
-                ha-card::after {
-                  bottom: 0; right: 0;
-                  border-bottom: 1px solid; border-right: 1px solid;
-                }
-          - type: markdown
-            content: '## FANIONS D''ÉTAT · REG 4130'
-            card_mod:
-              style:
-                ha-markdown:
-                  $: |
-                    h2 {
-                      font-size: 11px !important;
-                      letter-spacing: 0.30em !important;
-                      font-weight: 400 !important;
-                      color: var(--classic-phosphor-dim, #7FE3C4) !important;
-                      margin: 0 !important;
-                      text-transform: uppercase;
-                    }
-                .: |
-                  ha-card {
-                    background: transparent;
-                    border: none;
-                    border-bottom: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    box-shadow: none;
-                    padding: 18px 4px 6px 4px;
-                  }
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: CLASSIC 1
-                show_header_toggle: false
-                entities:
-                  - binary_sensor.classic1_classic_over_temperature
-                  - binary_sensor.classic1_groundfaultf
-                  - binary_sensor.classic1_arcfaultf
-                  - binary_sensor.classic1_ocp_over_current_protect
-                  - binary_sensor.classic1_lowbatteryvf
-                  - binary_sensor.classic1_hypervoc
-                  - binary_sensor.classic1_current_limit
-                  - binary_sensor.classic1_pvpartialshadef
-                  - binary_sensor.classic1_equalize_in_progress
-                  - binary_sensor.classic1_battery_temp_sensor_installed
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
-              - type: entities
-                title: CLASSIC 2
-                show_header_toggle: false
-                entities:
-                  - binary_sensor.classic2_classic_over_temperature
-                  - binary_sensor.classic2_groundfaultf
-                  - binary_sensor.classic2_arcfaultf
-                  - binary_sensor.classic2_ocp_over_current_protect
-                  - binary_sensor.classic2_lowbatteryvf
-                  - binary_sensor.classic2_hypervoc
-                  - binary_sensor.classic2_current_limit
-                  - binary_sensor.classic2_pvpartialshadef
-                  - binary_sensor.classic2_equalize_in_progress
-                  - binary_sensor.classic2_battery_temp_sensor_installed
-                card_mod:
-                  style: |
-                    ha-card {
-                      position: relative;
-                      background: linear-gradient(180deg,
-                        rgba(127,227,196,0.04) 0%, rgba(13,22,32,0) 55%),
-                        var(--classic-panel, #0D1620);
-                      border: 1px solid var(--classic-hairline, rgba(127,227,196,0.16));
-                    }
-                    ha-card::before, ha-card::after {
-                      content: ""; position: absolute;
-                      width: 9px; height: 9px;
-                      border-color: var(--classic-phosphor, #7FE3C4);
-                      opacity: 0.45; pointer-events: none;
-                    }
-                    ha-card::before {
-                      top: 0; left: 0;
-                      border-top: 1px solid; border-left: 1px solid;
-                    }
-                    ha-card::after {
-                      bottom: 0; right: 0;
-                      border-bottom: 1px solid; border-right: 1px solid;
-                    }
+# Classic Console — entités dérivées.  Révision 6.
+#
+# Révision 6 — énergie de la génératrice aujourd'hui (utility_meter) et
+# sur 7 jours glissants (statistics), pour le tableau de bord.
+#
+# Révision 5 — énergie de la génératrice pour le tableau Énergie :
+# « Génératrice Puissance de charge » (template, shunt dédié ou bilan
+# WhizBang Jr) et « Génératrice Énergie fournie » (integration).
+#
+# Révision 4 — `sensor.classic1_soc` remplacé par
+# `sensor.classic1_state_of_charge`, le nom réellement créé par
+# l'intégration ha_midnite_classic (paramètre SOC → « State Of Charge »).
+#
+# Révision 3 — ajout des clauses `availability:` sur tous les capteurs
+# dérivés.
+#
+#   Sans `availability:`, un capteur template publie une valeur même quand
+#   ses sources sont `unknown` / `unavailable` : le `| float(0)` fournit 0,
+#   et le capteur sort 0 (ou une somme amputée si une seule source manque).
+#   Sur un `total_increasing`, le recorder lit cette chute comme un nouveau
+#   cycle et réinjecte tout le compteur en delta dans les statistiques long
+#   terme — le tableau Énergie se retrouve gonflé à chaque coupure réseau.
+#
+#   Avec `availability:`, le capteur devient indisponible pendant la coupure.
+#   Un trou dans la courbe, pas un faux delta. Les `| float(0)` sont
+#   conservés : ils ne servent plus qu'à garantir un rendu sans erreur.
+#
+#   `has_value()` couvre à la fois `unknown` et `unavailable`.
+#
+# Installation : config/packages/classic_console.yaml
+#   homeassistant:
+#     packages: !include_dir_named packages
+
+template:
+  - binary_sensor:
+      # Miroir anti-rebond du relais AUX 1.
+      #
+      # Le capteur d'origine passe brièvement à `unavailable` quand
+      # l'intégration se recharge, et `history_stats` compte chaque retour à
+      # `on` comme un nouveau démarrage — d'où les 3 démarrages affichés pour
+      # une seule mise en marche réelle.
+      #
+      # `delay_off` absorbe ces trous : une coupure plus courte que 120 s ne
+      # produit aucune transition. Ce miroir sert UNIQUEMENT au comptage ;
+      # le temps de marche reste mesuré sur le capteur brut pour ne pas
+      # gonfler la durée de 120 s à chaque cycle.
+      #
+      # PAS de clause `availability:` ici, volontairement : elle annulerait
+      # l'effet de `delay_off`, qui est précisément là pour ignorer les
+      # indisponibilités courtes.
+      - name: "Génératrice en marche"
+        unique_id: generatrice_en_marche
+        device_class: running
+        delay_off:
+          seconds: 120
+        state: >
+          {{ is_state('binary_sensor.classic1_aux_1_state_on', 'on') }}
+
+  - sensor:
+      # --- Agrégats des deux contrôleurs ---------------------------------
+      - name: "Classic Puissance combinée"
+        unique_id: classic_puissance_combinee
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:solar-power-variant
+        availability: >
+          {{ has_value('sensor.classic1_power')
+             and has_value('sensor.classic2_power') }}
+        state: >
+          {{ (states('sensor.classic1_power') | float(0)
+            + states('sensor.classic2_power') | float(0)) | round(0) }}
+
+      - name: "Classic Récolte jour"
+        unique_id: classic_recolte_jour
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:solar-power
+        availability: >
+          {{ has_value('sensor.classic1_energy_today')
+             and has_value('sensor.classic2_energy_today') }}
+        state: >
+          {{ (states('sensor.classic1_energy_today') | float(0)
+            + states('sensor.classic2_energy_today') | float(0)) | round(2) }}
+
+      - name: "Classic Énergie cumulée"
+        unique_id: classic_energie_cumulee
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:counter
+        availability: >
+          {{ has_value('sensor.classic1_total_energy')
+             and has_value('sensor.classic2_total_energy') }}
+        state: >
+          {{ (states('sensor.classic1_total_energy') | float(0)
+            + states('sensor.classic2_total_energy') | float(0)) | round(1) }}
+
+      # --- Banque de batteries -------------------------------------------
+      # Le WhizBang Jr voit le courant réel de la banque (charge moins
+      # consommation), contrairement au courant batterie de chaque Classic.
+      - name: "Banque Puissance nette"
+        unique_id: banque_puissance_nette
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-charging-outline
+        availability: >
+          {{ has_value('sensor.classic1_battery_voltage')
+             and has_value('sensor.classic1_whizbang_battery_current') }}
+        state: >
+          {{ (states('sensor.classic1_battery_voltage') | float(0)
+            * states('sensor.classic1_whizbang_battery_current') | float(0))
+            | round(0) }}
+
+      - name: "Banque Sens du courant"
+        unique_id: banque_sens_du_courant
+        icon: mdi:swap-vertical
+        availability: >
+          {{ has_value('sensor.classic1_whizbang_battery_current') }}
+        state: >
+          {% set i = states('sensor.classic1_whizbang_battery_current') | float(0) %}
+          {% if i > 0.5 %}Charge
+          {% elif i < -0.5 %}Décharge
+          {% else %}Équilibre
+          {% endif %}
+
+      - name: "Banque Énergie accumulée"
+        unique_id: banque_energie_accumulee
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:battery-arrow-up
+        availability: >
+          {{ has_value('sensor.classic1_wbjr_amp_hours_positive') }}
+        state: >
+          {{ (states('sensor.classic1_wbjr_amp_hours_positive') | float(0)
+            * states('sensor.classic1_nominal_battery_voltage') | float(48)
+            / 1000) | round(1) }}
+
+      - name: "Banque Énergie fournie"
+        unique_id: banque_energie_fournie
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:battery-arrow-down
+        availability: >
+          {{ has_value('sensor.classic1_wbjr_amp_hours_negative') }}
+        state: >
+          {{ (states('sensor.classic1_wbjr_amp_hours_negative') | float(0) | abs
+            * states('sensor.classic1_nominal_battery_voltage') | float(48)
+            / 1000) | round(1) }}
+
+      # --- Génératrice ----------------------------------------------------
+      # Puissance de charge fournie par la génératrice à la banque.
+      #
+      # Deux méthodes, choisies par les trois lignes CONFIGURATION, présentes
+      # À L'IDENTIQUE dans `availability:` et dans `state:` — modifiez les deux.
+      #
+      # 1. Shunt dédié (recommandé, si vous en avez un) — par ex. un Victron
+      #    SmartShunt installé EN AVAL des Classic et du WhizBang Jr, sur le
+      #    négatif de la banque.  Il ne voit pas le solaire : un courant de
+      #    charge sur ce shunt ne peut venir que du chargeur de l'onduleur.
+      #      P_génératrice = V_shunt × I_shunt × signe
+      #    `signe` : 1 si le shunt affiche un courant POSITIF quand le
+      #    chargeur pousse dans la banque, -1 s'il l'affiche négatif.
+      #    Vérifiez-le une fois génératrice en marche.
+      #
+      # 2. Sans shunt (shunt_v et shunt_i vides) — bilan de la banque :
+      #      P_banque (WhizBang Jr) = P_solaire (Classic Puissance combinée) + P_chargeur
+      #      =>  P_génératrice ≈ P_banque − P_solaire
+      #    On soustrait le solaire pour ne pas le compter deux fois dans le
+      #    tableau Énergie.
+      #
+      # Dans les deux cas : borné à 0, et 0 quand la génératrice est arrêtée
+      # (miroir anti-rebond, insensible aux brèves coupures d'intégration).
+      # Les charges alimentées en dérivation (pass-through) par l'onduleur
+      # pendant la marche ne passent pas par la banque et ne sont pas
+      # comptées : c'est l'énergie que la génératrice met DANS LA BANQUE.
+      - name: "Génératrice Puissance de charge"
+        unique_id: generatrice_puissance_charge
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:engine
+        availability: >
+          {# --- CONFIGURATION (identique dans state:) --- #}
+          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
+          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set signe = 1 %}
+          {# --------------------------------------------- #}
+          {% if shunt_i %}
+            {{ has_value(shunt_v) and has_value(shunt_i) }}
+          {% else %}
+            {{ has_value('sensor.classic1_battery_voltage')
+               and has_value('sensor.classic1_whizbang_battery_current')
+               and has_value('sensor.classic_puissance_combinee') }}
+          {% endif %}
+        state: >
+          {# --- CONFIGURATION (identique dans availability:) --- #}
+          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
+          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set signe = 1 %}
+          {# ---------------------------------------------------- #}
+          {% if is_state('binary_sensor.generatrice_en_marche', 'on') %}
+            {% if shunt_i %}
+              {% set p = states(shunt_v) | float(0)
+                        * states(shunt_i) | float(0) * signe %}
+            {% else %}
+              {% set p = states('sensor.classic1_battery_voltage') | float(0)
+                        * states('sensor.classic1_whizbang_battery_current') | float(0)
+                        - states('sensor.classic_puissance_combinee') | float(0) %}
+            {% endif %}
+            {{ [p, 0] | max | round(0) }}
+          {% else %}0{% endif %}
+
+      - name: "Génératrice Marge avant démarrage"
+        unique_id: generatrice_marge_demarrage
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:gauge-low
+        availability: >
+          {{ has_value('sensor.classic1_state_of_charge')
+             and has_value('sensor.classic1_aux_1_low_threshold') }}
+        state: >
+          {{ (states('sensor.classic1_state_of_charge') | float(0)
+            - states('sensor.classic1_aux_1_low_threshold') | float(0))
+            | round(0) }}
+
+      # Ce capteur gère déjà l'indisponibilité par sa branche `Inconnu`.
+      # `availability:` est néanmoins préférable : « indisponible » se
+      # distingue d'un mode AUX 1 réellement non reconnu.
+      - name: "Génératrice Statut"
+        unique_id: generatrice_statut
+        icon: mdi:engine
+        availability: >
+          {{ has_value('binary_sensor.classic1_aux_1_state_on')
+             and has_value('select.classic1_aux_1_mode') }}
+        state: >
+          {% set relais = states('binary_sensor.classic1_aux_1_state_on') %}
+          {% set mode = states('select.classic1_aux_1_mode') %}
+          {% if mode == 'Aux 1 Off' %}Forcée à l'arrêt
+          {% elif mode == 'Aux 1 On' %}Forcée en marche
+          {% elif relais == 'on' %}En marche
+          {% elif relais == 'off' %}En attente
+          {% else %}Inconnu
+          {% endif %}
+
+sensor:
+  # Temps de marche : mesuré sur le capteur BRUT, pour rester exact.
+  # Une coupure d'intégration d'une fraction de seconde coûte une fraction de
+  # seconde de durée, ce qui est négligeable.
+  - platform: history_stats
+    name: Génératrice marche aujourd'hui
+    unique_id: generatrice_marche_jour
+    entity_id: binary_sensor.classic1_aux_1_state_on
+    state: "on"
+    type: time
+    start: "{{ today_at('00:00') }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: Génératrice marche 7 jours
+    unique_id: generatrice_marche_7j
+    entity_id: binary_sensor.classic1_aux_1_state_on
+    state: "on"
+    type: time
+    end: "{{ now() }}"
+    duration:
+      days: 7
+
+  # Démarrages : comptés sur le MIROIR anti-rebond.
+  # Le compteur repart de zéro à la création de l'entité — l'historique
+  # antérieur du miroir n'existe pas, donc le total du jour sera juste à
+  # partir du prochain cycle.
+  - platform: history_stats
+    name: Génératrice démarrages aujourd'hui
+    unique_id: generatrice_demarrages_jour
+    entity_id: binary_sensor.generatrice_en_marche
+    state: "on"
+    type: count
+    start: "{{ today_at('00:00') }}"
+    end: "{{ now() }}"
+
+  # Énergie fournie par la génératrice, pour le tableau Énergie.
+  # Somme de Riemann de « Génératrice Puissance de charge ».
+  #   method: left        recommandé pour une puissance qui saute de 0 à
+  #                       plusieurs centaines de watts : n'invente pas
+  #                       d'énergie entre deux mesures.
+  #   max_sub_interval    force un calcul chaque minute même si la
+  #                       puissance ne change pas (sinon, une puissance
+  #                       constante n'avance pas le compteur).
+  - platform: integration
+    name: Génératrice Énergie fournie
+    unique_id: generatrice_energie_fournie
+    source: sensor.generatrice_puissance_de_charge
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 3
+    max_sub_interval:
+      minutes: 1
+
+  # Énergie fournie par la génératrice sur 7 jours glissants, comme
+  # « Génératrice marche 7 jours ».  `change` = dernière valeur du compteur
+  # moins la plus ancienne conservée dans la fenêtre.  L'intégration publie
+  # au plus une valeur par minute : 7 × 24 × 60 = 10 080 échantillons.
+  - platform: statistics
+    name: Génératrice énergie 7 jours
+    unique_id: generatrice_energie_7_jours
+    entity_id: sensor.generatrice_energie_fournie
+    state_characteristic: change
+    max_age:
+      days: 7
+    sampling_size: 12000
+    precision: 2
+
+# Énergie fournie par la génératrice aujourd'hui (remise à 0 à minuit).
+utility_meter:
+  generatrice_energie_aujourd_hui:
+    name: Génératrice énergie aujourd'hui
+    unique_id: generatrice_energie_aujourd_hui
+    source: sensor.generatrice_energie_fournie
+    cycle: daily
+
+automation:
+  # Les capteurs porteurs d'une unité sont exclus du journal. Ces deux
+  # automatisations réinjectent les changements de configuration AUX 1 dans le
+  # journal du relais, pour qu'ils se lisent à côté des cycles de génératrice.
+  - id: classic_journal_config_aux1
+    alias: "Classic — journal configuration AUX 1"
+    mode: queued
+    max: 10
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.classic1_aux_1_high_threshold
+          - sensor.classic1_aux_1_low_threshold
+          - sensor.classic1_aux_1_delay_time
+          - sensor.classic1_aux_1_hold_time
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.from_state.state not in ['unknown', 'unavailable']
+             and trigger.to_state.state not in ['unknown', 'unavailable']
+             and trigger.from_state.state != trigger.to_state.state }}
+    actions:
+      - action: logbook.log
+        data:
+          name: Config AUX 1
+          message: >
+            {{ trigger.to_state.name }} : {{ trigger.from_state.state }} →
+            {{ trigger.to_state.state }}
+            {{ trigger.to_state.attributes.unit_of_measurement }}
+          entity_id: binary_sensor.classic1_aux_1_state_on
+
+  - id: classic_journal_mode_aux1
+    alias: "Classic — journal mode AUX 1"
+    mode: queued
+    max: 5
+    triggers:
+      - trigger: state
+        entity_id: select.classic1_aux_1_mode
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.from_state.state not in ['unknown', 'unavailable']
+             and trigger.to_state.state not in ['unknown', 'unavailable']
+             and trigger.from_state.state != trigger.to_state.state }}
+    actions:
+      - action: logbook.log
+        data:
+          name: Mode AUX 1
+          message: "{{ trigger.from_state.state }} → {{ trigger.to_state.state }}"
+          entity_id: binary_sensor.classic1_aux_1_state_on

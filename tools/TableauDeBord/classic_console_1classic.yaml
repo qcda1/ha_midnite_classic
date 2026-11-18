@@ -1,4 +1,7 @@
-# Classic Console — entités dérivées, version UN SEUL CLASSIC.  Révision 5.
+# Classic Console — entités dérivées, version UN SEUL CLASSIC.  Révision 6.
+#
+# Révision 6 — énergie de la génératrice aujourd'hui (utility_meter) et
+# sur 7 jours glissants (statistics), pour le tableau de bord.
 #
 # Révision 5 — énergie de la génératrice pour le tableau Énergie :
 # « Génératrice Puissance de charge » (template, shunt dédié ou bilan
@@ -129,8 +132,8 @@ template:
         icon: mdi:engine
         availability: >
           {# --- CONFIGURATION (identique dans state:) --- #}
-          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
-          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set shunt_v = '' %}
+          {% set shunt_i = '' %}
           {% set signe = 1 %}
           {# --------------------------------------------- #}
           {% if shunt_i %}
@@ -142,8 +145,8 @@ template:
           {% endif %}
         state: >
           {# --- CONFIGURATION (identique dans availability:) --- #}
-          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
-          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set shunt_v = '' %}
+          {% set shunt_i = '' %}
           {% set signe = 1 %}
           {# ---------------------------------------------------- #}
           {% if is_state('binary_sensor.generatrice_en_marche', 'on') %}
@@ -244,6 +247,28 @@ sensor:
     round: 3
     max_sub_interval:
       minutes: 1
+
+  # Énergie fournie par la génératrice sur 7 jours glissants, comme
+  # « Génératrice marche 7 jours ».  `change` = dernière valeur du compteur
+  # moins la plus ancienne conservée dans la fenêtre.  L'intégration publie
+  # au plus une valeur par minute : 7 × 24 × 60 = 10 080 échantillons.
+  - platform: statistics
+    name: Génératrice énergie 7 jours
+    unique_id: generatrice_energie_7_jours
+    entity_id: sensor.generatrice_energie_fournie
+    state_characteristic: change
+    max_age:
+      days: 7
+    sampling_size: 12000
+    precision: 2
+
+# Énergie fournie par la génératrice aujourd'hui (remise à 0 à minuit).
+utility_meter:
+  generatrice_energie_aujourd_hui:
+    name: Génératrice énergie aujourd'hui
+    unique_id: generatrice_energie_aujourd_hui
+    source: sensor.generatrice_energie_fournie
+    cycle: daily
 
 automation:
   # Les capteurs porteurs d'une unité sont exclus du journal. Ces deux

@@ -125,7 +125,7 @@ Après le redémarrage, ces entités doivent exister
 - `sensor.generatrice_statut`, `sensor.generatrice_marge_avant_demarrage`
 - `sensor.generatrice_marche_aujourd_hui`, `sensor.generatrice_marche_7_jours`, `sensor.generatrice_demarrages_aujourd_hui`
 - `binary_sensor.generatrice_en_marche`
-- `sensor.generatrice_puissance_de_charge`, `sensor.generatrice_energie_fournie`
+- `sensor.generatrice_puissance_de_charge`, `sensor.generatrice_energie_fournie`, `sensor.generatrice_energie_aujourd_hui`, `sensor.generatrice_energie_7_jours`
 
 
 ### 4. Créer le tableau de bord
@@ -207,6 +207,8 @@ génératrice met dans la banque :
 |---|---|
 | `sensor.generatrice_puissance_de_charge` | Puissance de charge (W), 0 quand la génératrice est arrêtée |
 | `sensor.generatrice_energie_fournie` | Énergie cumulée (kWh), à utiliser dans le tableau Énergie |
+| `sensor.generatrice_energie_aujourd_hui` | Énergie du jour (kWh), remise à 0 à minuit — affichée dans le tableau de bord |
+| `sensor.generatrice_energie_7_jours` | Énergie sur 7 jours glissants (kWh) — affichée dans le tableau de bord |
 
 Home Assistant n'a pas de type de source « génératrice ». Déclarez-la comme
 réseau électrique : **Paramètres → Tableaux de bord → Énergie → Réseau
@@ -278,6 +280,7 @@ simplement à 0 : rien n'est compté, mais aucune valeur fausse n'est produite.
 | Valeurs `unknown` dans une carte | Paramètre non coché dans les options de l'intégration (prérequis 2). |
 | « Entité non disponible : sensor.classic_… » | Package non chargé : vérifier `packages:` dans `configuration.yaml` et redémarrer. |
 | Section *Combiné* indisponible (deux Classic) | L'un des deux Classic ne répond pas. Les totaux sont volontairement indisponibles tant qu'une source manque, pour ne pas fausser le tableau Énergie. |
+| *Énergie 7 j* inférieure à la réalité | Normal pendant la première semaine : la fenêtre ne contient que les valeurs depuis l'installation. |
 | Le nombre de démarrages est à 0 malgré une génératrice en marche | Normal le premier jour : le compteur ne voit que les cycles survenus après la création de l'entité. |
 | *Génératrice Puissance de charge* reste à 0 pendant la marche | Avec un shunt dédié : `signe` inversé (voir l'étape 7). Sans shunt : le solaire couvre toute la charge mesurée. |
 | *Génératrice Puissance de charge* indisponible | Une des entités sources ne répond pas, par exemple un shunt Bluetooth hors de portée. L'énergie de cette période n'est pas comptée. |
