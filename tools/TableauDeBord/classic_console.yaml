@@ -183,8 +183,8 @@ template:
         icon: mdi:engine
         availability: >
           {# --- CONFIGURATION (identique dans state:) --- #}
-          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
-          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set shunt_v = '' %}
+          {% set shunt_i = '' %}
           {% set signe = 1 %}
           {# --------------------------------------------- #}
           {% if shunt_i %}
@@ -196,8 +196,8 @@ template:
           {% endif %}
         state: >
           {# --- CONFIGURATION (identique dans availability:) --- #}
-          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
-          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set shunt_v = '' %}
+          {% set shunt_i = '' %}
           {% set signe = 1 %}
           {# ---------------------------------------------------- #}
           {% if is_state('binary_sensor.generatrice_en_marche', 'on') %}
