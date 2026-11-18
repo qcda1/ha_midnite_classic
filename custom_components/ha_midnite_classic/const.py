@@ -1,7 +1,7 @@
 """Constants for the Midnite Solar Classic integration."""
 
 DOMAIN = "ha_midnite_classic"
-VERSION = "1.4.0"
+VERSION = "1.4.2"
 
 # Config entry keys
 CONF_HOST = "host"

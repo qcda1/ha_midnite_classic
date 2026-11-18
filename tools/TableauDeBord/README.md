@@ -125,6 +125,7 @@ Après le redémarrage, ces entités doivent exister
 - `sensor.generatrice_statut`, `sensor.generatrice_marge_avant_demarrage`
 - `sensor.generatrice_marche_aujourd_hui`, `sensor.generatrice_marche_7_jours`, `sensor.generatrice_demarrages_aujourd_hui`
 - `binary_sensor.generatrice_en_marche`
+- `sensor.generatrice_puissance_de_charge`, `sensor.generatrice_energie_fournie`
 
 
 ### 4. Créer le tableau de bord
@@ -197,6 +198,75 @@ bord de votre variante :
 
 Pour une banque 12 V ou 24 V, divisez les bornes de tension par 4 ou par 2.
 
+### 7. Énergie de la génératrice dans le tableau Énergie (facultatif)
+
+Le package crée deux capteurs pour comptabiliser l'énergie que la
+génératrice met dans la banque :
+
+| Entité | Rôle |
+|---|---|
+| `sensor.generatrice_puissance_de_charge` | Puissance de charge (W), 0 quand la génératrice est arrêtée |
+| `sensor.generatrice_energie_fournie` | Énergie cumulée (kWh), à utiliser dans le tableau Énergie |
+
+Home Assistant n'a pas de type de source « génératrice ». Déclarez-la comme
+réseau électrique : **Paramètres → Tableaux de bord → Énergie → Réseau
+électrique → Ajouter une consommation**, puis choisissez
+`sensor.generatrice_energie_fournie`.
+
+#### Choisir la méthode de mesure
+
+La puissance de la génératrice n'est mesurée par aucun appareil de
+l'intégration. Le capteur la calcule de l'une de deux façons, selon les trois
+lignes `CONFIGURATION` du capteur *Génératrice Puissance de charge* dans le
+package :
+
+```jinja
+{% set shunt_v = '' %}
+{% set shunt_i = '' %}
+{% set signe = 1 %}
+```
+
+Ces trois lignes apparaissent **deux fois**, sous `availability:` et sous
+`state:`. Modifiez les deux de la même façon.
+
+**Sans shunt dédié (par défaut, lignes vides).** Le capteur fait le bilan de
+la banque vu par le WhizBang Jr, moins la production des Classic :
+P_génératrice ≈ P_banque − P_solaire. On retire le solaire pour ne pas le
+compter deux fois dans le tableau Énergie.
+
+**Avec un shunt dédié (recommandé).** Si un shunt, par exemple un Victron
+SmartShunt, est installé **en aval** des Classic et du WhizBang Jr sur le
+négatif de la banque, il ne voit pas le solaire : un courant de charge sur
+ce shunt ne peut venir que du chargeur de l'onduleur. La mesure est alors
+directe. Indiquez ses entités de tension et de courant :
+
+```jinja
+{% set shunt_v = 'sensor.smartshunt_xxxxxxxxxx_tension' %}
+{% set shunt_i = 'sensor.smartshunt_xxxxxxxxxx_courant' %}
+{% set signe = -1 %}
+```
+
+#### Le sens du courant : `signe`
+
+`signe` doit valoir `1` si le shunt affiche un courant **positif** quand le
+chargeur pousse dans la banque, et `-1` s'il l'affiche **négatif**.
+
+- Un **Victron SmartShunt réglé en « Charge générique »** (*Generic load*,
+  type de compteur `generic_load`) suit la convention d'un compteur de
+  charge : la consommation est positive, la charge de la banque est
+  négative. Il faut donc **`signe = -1`**.
+- Un shunt réglé en moniteur de batterie affiche habituellement la charge en
+  positif : gardez `signe = 1`.
+
+Pour le vérifier, regardez l'historique du courant du shunt pendant une
+marche de la génératrice. Avec un mauvais signe, le capteur reste
+simplement à 0 : rien n'est compté, mais aucune valeur fausse n'est produite.
+
+> **Limite.** Les deux méthodes mesurent l'énergie que la génératrice met
+> **dans la banque**. Les charges alimentées en dérivation (*pass-through*)
+> par l'onduleur-chargeur pendant la marche ne passent pas par la banque et
+> ne sont pas comptées.
+
 ---
 
 ## Dépannage
@@ -209,6 +279,8 @@ Pour une banque 12 V ou 24 V, divisez les bornes de tension par 4 ou par 2.
 | « Entité non disponible : sensor.classic_… » | Package non chargé : vérifier `packages:` dans `configuration.yaml` et redémarrer. |
 | Section *Combiné* indisponible (deux Classic) | L'un des deux Classic ne répond pas. Les totaux sont volontairement indisponibles tant qu'une source manque, pour ne pas fausser le tableau Énergie. |
 | Le nombre de démarrages est à 0 malgré une génératrice en marche | Normal le premier jour : le compteur ne voit que les cycles survenus après la création de l'entité. |
+| *Génératrice Puissance de charge* reste à 0 pendant la marche | Avec un shunt dédié : `signe` inversé (voir l'étape 7). Sans shunt : le solaire couvre toute la charge mesurée. |
+| *Génératrice Puissance de charge* indisponible | Une des entités sources ne répond pas, par exemple un shunt Bluetooth hors de portée. L'énergie de cette période n'est pas comptée. |
 
 ---
 

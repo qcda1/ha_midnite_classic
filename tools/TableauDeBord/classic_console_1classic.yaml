@@ -1,4 +1,8 @@
-# Classic Console — entités dérivées, version UN SEUL CLASSIC.  Révision 4.
+# Classic Console — entités dérivées, version UN SEUL CLASSIC.  Révision 5.
+#
+# Révision 5 — énergie de la génératrice pour le tableau Énergie :
+# « Génératrice Puissance de charge » (template, shunt dédié ou bilan
+# WhizBang Jr) et « Génératrice Énergie fournie » (integration).
 #
 # Identique à classic_console.yaml (deux Classic), sans les trois agrégats
 # « Classic Puissance combinée / Récolte jour / Énergie cumulée » : avec un
@@ -92,6 +96,68 @@ template:
             / 1000) | round(1) }}
 
       # --- Génératrice ----------------------------------------------------
+      # Puissance de charge fournie par la génératrice à la banque.
+      #
+      # Deux méthodes, choisies par les trois lignes CONFIGURATION, présentes
+      # À L'IDENTIQUE dans `availability:` et dans `state:` — modifiez les deux.
+      #
+      # 1. Shunt dédié (recommandé, si vous en avez un) — par ex. un Victron
+      #    SmartShunt installé EN AVAL des Classic et du WhizBang Jr, sur le
+      #    négatif de la banque.  Il ne voit pas le solaire : un courant de
+      #    charge sur ce shunt ne peut venir que du chargeur de l'onduleur.
+      #      P_génératrice = V_shunt × I_shunt × signe
+      #    `signe` : 1 si le shunt affiche un courant POSITIF quand le
+      #    chargeur pousse dans la banque, -1 s'il l'affiche négatif.
+      #    Vérifiez-le une fois génératrice en marche.
+      #
+      # 2. Sans shunt (shunt_v et shunt_i vides) — bilan de la banque :
+      #      P_banque (WhizBang Jr) = P_solaire (Power du Classic) + P_chargeur
+      #      =>  P_génératrice ≈ P_banque − P_solaire
+      #    On soustrait le solaire pour ne pas le compter deux fois dans le
+      #    tableau Énergie.
+      #
+      # Dans les deux cas : borné à 0, et 0 quand la génératrice est arrêtée
+      # (miroir anti-rebond, insensible aux brèves coupures d'intégration).
+      # Les charges alimentées en dérivation (pass-through) par l'onduleur
+      # pendant la marche ne passent pas par la banque et ne sont pas
+      # comptées : c'est l'énergie que la génératrice met DANS LA BANQUE.
+      - name: "Génératrice Puissance de charge"
+        unique_id: generatrice_puissance_charge
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        icon: mdi:engine
+        availability: >
+          {# --- CONFIGURATION (identique dans state:) --- #}
+          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
+          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set signe = 1 %}
+          {# --------------------------------------------- #}
+          {% if shunt_i %}
+            {{ has_value(shunt_v) and has_value(shunt_i) }}
+          {% else %}
+            {{ has_value('sensor.classic1_battery_voltage')
+               and has_value('sensor.classic1_whizbang_battery_current')
+               and has_value('sensor.classic1_power') }}
+          {% endif %}
+        state: >
+          {# --- CONFIGURATION (identique dans availability:) --- #}
+          {% set shunt_v = 'sensor.smartshunt_hq2228jktuw_tension' %}
+          {% set shunt_i = 'sensor.smartshunt_hq2228jktuw_courant' %}
+          {% set signe = 1 %}
+          {# ---------------------------------------------------- #}
+          {% if is_state('binary_sensor.generatrice_en_marche', 'on') %}
+            {% if shunt_i %}
+              {% set p = states(shunt_v) | float(0)
+                        * states(shunt_i) | float(0) * signe %}
+            {% else %}
+              {% set p = states('sensor.classic1_battery_voltage') | float(0)
+                        * states('sensor.classic1_whizbang_battery_current') | float(0)
+                        - states('sensor.classic1_power') | float(0) %}
+            {% endif %}
+            {{ [p, 0] | max | round(0) }}
+          {% else %}0{% endif %}
+
       - name: "Génératrice Marge avant démarrage"
         unique_id: generatrice_marge_demarrage
         unit_of_measurement: "%"
@@ -159,6 +225,25 @@ sensor:
     type: count
     start: "{{ today_at('00:00') }}"
     end: "{{ now() }}"
+
+  # Énergie fournie par la génératrice, pour le tableau Énergie.
+  # Somme de Riemann de « Génératrice Puissance de charge ».
+  #   method: left        recommandé pour une puissance qui saute de 0 à
+  #                       plusieurs centaines de watts : n'invente pas
+  #                       d'énergie entre deux mesures.
+  #   max_sub_interval    force un calcul chaque minute même si la
+  #                       puissance ne change pas (sinon, une puissance
+  #                       constante n'avance pas le compteur).
+  - platform: integration
+    name: Génératrice Énergie fournie
+    unique_id: generatrice_energie_fournie
+    source: sensor.generatrice_puissance_de_charge
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 3
+    max_sub_interval:
+      minutes: 1
 
 automation:
   # Les capteurs porteurs d'une unité sont exclus du journal. Ces deux
